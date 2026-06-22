@@ -613,7 +613,7 @@ function MosaicBuilder() {
   );
 }
 
-function ChallengeProofUpload({ folder }) {
+function ChallengeProofUpload({ folder, onUploaded }) {
   return (
     <div className="space-y-1.5">
       <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold">Challenge proof</p>
@@ -621,6 +621,7 @@ function ChallengeProofUpload({ folder }) {
         folder={folder || "challenge"}
         label="Upload your photo"
         sublabel="proof your group completed this challenge — goes into the City Chronicle album"
+        onUploaded={onUploaded}
       />
     </div>
   );
@@ -697,7 +698,8 @@ function PhotoUploadSlot({ label, sublabel, folder = "misc", tall = false, compa
   async function handleFile(e) {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-    setPreviewUrl(URL.createObjectURL(file));
+    const localUrl = URL.createObjectURL(file);
+    setPreviewUrl(localUrl);
     setStatus("uploading");
     setErrorMsg("");
     const { url, error } = await uploadChallengePhoto(file, folder);
@@ -706,6 +708,7 @@ function PhotoUploadSlot({ label, sublabel, folder = "misc", tall = false, compa
       onUploaded?.(url);
     } else if (error === "local-only") {
       setStatus("local-only");
+      onUploaded?.(localUrl);
     } else {
       setStatus("error");
       setErrorMsg(error || "Upload failed.");
@@ -822,6 +825,12 @@ export default function ScavengerHuntPrototype() {
   const [pending, setPending] = useState(null);
   const [arrivalPending, setArrivalPending] = useState(null); // station awaiting staff approval of found-it photo
   const [arrivalApprovals, setArrivalApprovals] = useState({}); // {stationId: true} once staff has unlocked it
+  const [photoUploads, setPhotoUploads] = useState({}); // {folderKey: url} every camper-submitted photo, for staff/admin views
+
+  function recordPhotoUpload(key, url) {
+    if (!url) return;
+    setPhotoUploads((p) => ({ ...p, [key]: url }));
+  }
   const [orderGuess, setOrderGuess] = useState([]);
   const [finaleDone, setFinaleDone] = useState(false);
   const [log, setLog] = useState([]);
@@ -929,12 +938,14 @@ export default function ScavengerHuntPrototype() {
     setPhase(station.id === 7 ? "pitstop" : "travel");
   }
 
-  function submitChallenge() {
+  function submitChallenge(photoUrl) {
     if (station.judging === "staff") {
-      setPending(station);
+      setPending({ ...station, photoUrl });
+      if (photoUrl) recordPhotoUpload(`challenge-${station.id}`, photoUrl);
       pushLog(`Submitted to staff for approval: Station ${station.id}.`);
     } else if (station.judging === "palace") {
-      setPending(station);
+      setPending({ ...station, photoUrl });
+      if (photoUrl) recordPhotoUpload(`challenge-${station.id}`, photoUrl);
       pushLog(`Submitted to staff for approval: Station ${station.id} (Palau Güell).`);
     } else if (station.judging === "auto") {
       awardStation(station);
@@ -957,10 +968,11 @@ export default function ScavengerHuntPrototype() {
     }
   }
 
-  function submitCrossingChallenge() {
+  function submitCrossingChallenge(photoUrl) {
     setDragonCards((p) => ({ ...p, [station.id]: "x" }));
     pushLog(`Dragon Collection card revealed: ${station.creature} — stamped with an X.`);
     setChronicle((c) => [...c, { id: station.id, name: "Hotel across the street", fact: station.crossFactLog, moral: station.crossMoral }]);
+    if (photoUrl) recordPhotoUpload(`crossing-${station.id}`, photoUrl);
     setPhase("resolved");
   }
 
@@ -983,8 +995,9 @@ export default function ScavengerHuntPrototype() {
     setPending(null);
   }
 
-  function submitArrivalProof(targetStation) {
-    setArrivalPending(targetStation);
+  function submitArrivalProof(targetStation, photoUrl) {
+    setArrivalPending({ ...targetStation, photoUrl });
+    if (photoUrl) recordPhotoUpload(`arrival-${targetStation.id}`, photoUrl);
     pushLog(`Submitted found-it photo for staff approval: Station ${targetStation.id} (${targetStation.name}).`);
   }
 
@@ -1036,6 +1049,7 @@ export default function ScavengerHuntPrototype() {
     setPending(null);
     setArrivalPending(null);
     setArrivalApprovals({});
+    setPhotoUploads({});
     setOrderGuess([]);
     setFinaleDone(false);
     setLog([]);
@@ -1119,6 +1133,7 @@ export default function ScavengerHuntPrototype() {
             submitSwordOrder={submitSwordOrder}
             submitChallenge={submitChallenge}
             submitCrossingChallenge={submitCrossingChallenge}
+            recordPhotoUpload={recordPhotoUpload}
             advanceToNextStation={advanceToNextStation}
             goToMap={goToMap}
             finaleDone={finaleDone}
@@ -1136,6 +1151,7 @@ export default function ScavengerHuntPrototype() {
             iceCream={iceCream}
             dragonCards={dragonCards}
             onRestart={resetAll}
+            recordPhotoUpload={recordPhotoUpload}
           />
         )}
 
@@ -1167,6 +1183,7 @@ export default function ScavengerHuntPrototype() {
             sword={sword}
             iceCream={iceCream}
             finaleDone={finaleDone}
+            photoUploads={photoUploads}
           />
         )}
       </div>
@@ -1195,6 +1212,7 @@ function Modal({ children, onClose }) {
 }
 
 function ArrivalProofModal({ targetStation, onSubmit, onCancel }) {
+  const [photoUrl, setPhotoUrl] = React.useState(null);
   return (
     <Modal onClose={onCancel}>
       <h3 className="quest-display text-lg mb-1">Prove you found it</h3>
@@ -1203,11 +1221,13 @@ function ArrivalProofModal({ targetStation, onSubmit, onCancel }) {
         folder={`arrival-${targetStation.id}`}
         label="Upload your group's photo"
         sublabel="a quick snap of your group at the spot — staff will check it and unlock the station"
+        onUploaded={setPhotoUrl}
       />
       <div className="flex gap-2 mt-4">
         <button
-          onClick={() => onSubmit(targetStation)}
-          className="flex-1 bg-emerald-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-emerald-800 transition-colors"
+          onClick={() => onSubmit(targetStation, photoUrl)}
+          disabled={!photoUrl}
+          className="flex-1 bg-emerald-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-emerald-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Submit for approval
         </button>
@@ -1215,6 +1235,7 @@ function ArrivalProofModal({ targetStation, onSubmit, onCancel }) {
           Cancel
         </button>
       </div>
+      {!photoUrl && <p className="text-[11px] text-[#a8987a] mt-2">Upload a photo above before submitting.</p>}
     </Modal>
   );
 }
@@ -1399,7 +1420,7 @@ function InstructionsScreen({ onStart, onBack }) {
 /* ---------------------------------------------------------------------- */
 /* CLOSING SCREEN — congratulations + compiled moral of the story         */
 /* ---------------------------------------------------------------------- */
-function ClosingScreen({ chronicle, lettersCollected, badges, sword, iceCream, dragonCards, onRestart }) {
+function ClosingScreen({ chronicle, lettersCollected, badges, sword, iceCream, dragonCards, onRestart, recordPhotoUpload }) {
   const realFound = Object.values(dragonCards).includes("real");
   return (
     <div className="space-y-5 quest-body">
@@ -1409,7 +1430,12 @@ function ClosingScreen({ chronicle, lettersCollected, badges, sword, iceCream, d
         <p className="text-sm text-[#a8987a] uppercase tracking-wide font-semibold mb-5">
           {realFound ? "Sant Jordi's Dragon — found at last" : "Hunt ended early"}
         </p>
-        <PhotoUploadSlot folder="final-group" label="Final group photo" sublabel="add your group's last photo together, here at the Generalitat" />
+        <PhotoUploadSlot
+          folder="final-group"
+          label="Final group photo"
+          sublabel="add your group's last photo together, here at the Generalitat"
+          onUploaded={(url) => recordPhotoUpload?.("final-group", url)}
+        />
       </Card>
 
       <Card>
@@ -1651,6 +1677,7 @@ function CamperView({
   submitSwordOrder,
   submitChallenge,
   submitCrossingChallenge,
+  recordPhotoUpload,
   advanceToNextStation,
   goToMap,
   finaleDone,
@@ -1662,6 +1689,10 @@ function CamperView({
   const isLastStation = stationIdx === total - 1;
   const nextStation = stationsData[stationIdx + 1];
   const [arrivalModalTarget, setArrivalModalTarget] = React.useState(null);
+  const [challengeProofUrl, setChallengeProofUrl] = React.useState(null);
+  React.useEffect(() => {
+    setChallengeProofUrl(null);
+  }, [stationIdx]);
 
   return (
     <div className="space-y-5 quest-body">
@@ -1742,22 +1773,24 @@ function CamperView({
             <p className="text-[#4a4233] leading-relaxed">{station.challengeText}</p>
             {station.id === 5 && <DrawingPad />}
             {station.id === 11 && <MosaicBuilder />}
-            {station.judging !== "dragon" && station.judging !== "finale" && <ChallengeProofUpload folder={`challenge-${station.id}`} />}
+            {station.judging !== "dragon" && station.judging !== "finale" && (
+              <ChallengeProofUpload folder={`challenge-${station.id}`} onUploaded={setChallengeProofUrl} />
+            )}
 
             {isPendingHere ? (
               <div className="flex items-center gap-2 text-sm bg-amber-100 border border-amber-300 rounded-lg px-3 py-2 text-amber-800">
                 <ScrollText className="w-4 h-4" /> Waiting on staff approval...
               </div>
             ) : station.judging === "dragon" ? (
-              <button onClick={submitChallenge} className="bg-rose-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-rose-800 transition-colors">
+              <button onClick={() => submitChallenge(challengeProofUrl)} className="bg-rose-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-rose-800 transition-colors">
                 Identify the creature
               </button>
             ) : isFinale ? (
-              <button onClick={submitChallenge} className="bg-emerald-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-emerald-800 transition-colors">
+              <button onClick={() => submitChallenge(challengeProofUrl)} className="bg-emerald-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-emerald-800 transition-colors">
                 Submit finale collectables
               </button>
             ) : (
-              <button onClick={submitChallenge} className="bg-amber-600 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-amber-700 transition-colors">
+              <button onClick={() => submitChallenge(challengeProofUrl)} className="bg-amber-600 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-amber-700 transition-colors">
                 {station.judging === "bridge" ? "Complete blindfold challenge" : "Complete challenge"}
               </button>
             )}
@@ -1826,8 +1859,8 @@ function CamperView({
             <p className="text-[#4a4233] leading-relaxed italic">"{station.crossHistory}"</p>
             <h3 className="text-sm font-semibold text-[#6b5f4a] uppercase tracking-wide">The Challenge</h3>
             <p className="text-[#4a4233] leading-relaxed">{station.crossChallengeText}</p>
-            <ChallengeProofUpload folder={`crossing-${station.id}`} />
-            <button onClick={submitCrossingChallenge} className="bg-rose-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-rose-800 transition-colors">
+            <ChallengeProofUpload folder={`crossing-${station.id}`} onUploaded={setChallengeProofUrl} />
+            <button onClick={() => submitCrossingChallenge(challengeProofUrl)} className="bg-rose-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-rose-800 transition-colors">
               Identify the creature
             </button>
           </div>
@@ -1861,7 +1894,12 @@ function CamperView({
                 <PicturePlaceholder src={characterImageUrl(station.id)} label={station.character} sublabel="character" />
               </div>
               <div>
-                <PhotoUploadSlot folder={`group-${station.id}`} label="Your group" sublabel="add your completed-challenge photo" />
+                <PhotoUploadSlot
+                  folder={`group-${station.id}`}
+                  label="Your group"
+                  sublabel="add your completed-challenge photo"
+                  onUploaded={(url) => recordPhotoUpload(`group-${station.id}`, url)}
+                />
               </div>
             </div>
 
@@ -1952,8 +1990,8 @@ function CamperView({
         <ArrivalProofModal
           targetStation={arrivalModalTarget}
           onCancel={() => setArrivalModalTarget(null)}
-          onSubmit={(target) => {
-            submitArrivalProof(target);
+          onSubmit={(target, photoUrl) => {
+            submitArrivalProof(target, photoUrl);
             setArrivalModalTarget(null);
           }}
         />
@@ -2078,12 +2116,17 @@ function CollectionArea({ act, lettersCollected, arcsPopped, sword, iceCream, ba
         {chronicle.length === 0 ? (
           <p className="text-xs text-[#a8987a] italic">No history recorded yet.</p>
         ) : (
-          <ul className="text-xs text-[#4a4233] space-y-2">
+          <ul className="text-xs text-[#4a4233] space-y-2.5">
             {chronicle.map((c, i) => (
-              <li key={i}>
-                <span className="font-semibold">{c.id}. {c.name}</span> — {c.fact}
-                <br />
-                <span className="text-[#8a7a5a] italic">Moral: {c.moral}</span>
+              <li key={i} className="flex gap-2.5">
+                <div className="w-12 h-12 shrink-0">
+                  <PicturePlaceholder src={nextClueImageUrl(c.id)} compact />
+                </div>
+                <div>
+                  <span className="font-semibold">{c.id}. {c.name}</span> — {c.fact}
+                  <br />
+                  <span className="text-[#8a7a5a] italic">Moral: {c.moral}</span>
+                </div>
               </li>
             ))}
           </ul>
@@ -2223,6 +2266,15 @@ function StaffView({ pending, approvePending, rejectPending, arrivalPending, app
           <div className="border border-amber-300 bg-amber-50 rounded-lg p-4">
             <p className="text-sm text-[#4a4233] mb-1 font-semibold">Station {arrivalPending.id} — {arrivalPending.name}</p>
             <p className="text-sm text-[#6b5f4a] mb-3">Group submitted a photo proving they found this station. Check it, then unlock the station.</p>
+            {arrivalPending.photoUrl ? (
+              <img
+                src={arrivalPending.photoUrl}
+                alt={`Found-it proof for Station ${arrivalPending.id}`}
+                className="w-full max-w-xs rounded-lg border border-amber-300 mb-3 object-cover aspect-[4/3]"
+              />
+            ) : (
+              <p className="text-xs text-rose-700 mb-3">No photo came through with this submission.</p>
+            )}
             <div className="flex gap-2">
               <button onClick={approveArrival} className="bg-emerald-700 text-white rounded-full px-4 py-1.5 text-sm font-semibold hover:bg-emerald-800">
                 Approve &amp; unlock
@@ -2245,6 +2297,15 @@ function StaffView({ pending, approvePending, rejectPending, arrivalPending, app
           <div className="border border-amber-300 bg-amber-50 rounded-lg p-4">
             <p className="text-sm text-[#4a4233] mb-1 font-semibold">Station {pending.id} — {pending.name}</p>
             <p className="text-sm text-[#6b5f4a] mb-3">{pending.challengeText}</p>
+            {pending.photoUrl ? (
+              <img
+                src={pending.photoUrl}
+                alt={`Challenge proof for Station ${pending.id}`}
+                className="w-full max-w-xs rounded-lg border border-amber-300 mb-3 object-cover aspect-[4/3]"
+              />
+            ) : (
+              <p className="text-xs text-rose-700 mb-3">No photo came through with this submission.</p>
+            )}
             <div className="flex gap-2">
               <button onClick={approvePending} className="bg-emerald-700 text-white rounded-full px-4 py-1.5 text-sm font-semibold hover:bg-emerald-800">
                 Approve
@@ -2287,7 +2348,7 @@ function SyncStatusBadge({ status }) {
   );
 }
 
-function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsList, groupsSyncStatus, group, stationIdx, lettersCollected, badges, dragonCards, sword, iceCream, finaleDone }) {
+function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsList, groupsSyncStatus, group, stationIdx, lettersCollected, badges, dragonCards, sword, iceCream, finaleDone, photoUploads = {} }) {
   const liveStation = stationsData[stationIdx];
   const liveProgress = Math.round(((stationIdx + 1) / stationsData.length) * 100);
   const [editingId, setEditingId] = React.useState(null);
@@ -2407,16 +2468,32 @@ function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsLi
       <Card>
         <h3 className="text-sm font-semibold text-[#6b5f4a] mb-1 uppercase tracking-wide">Group albums</h3>
         <p className="text-xs text-[#8a7a5a] mb-3">
-          Every photo a group submits, organized by group — for review or printing afterward. Real photos populate
-          here once Submissions + Realtime sync are wired (next build step); for now this shows real group names
-          with a placeholder count based on this device's local progress.
+          Every photo a group submits, organized by group — for review or printing afterward. Real thumbnails show
+          for this device's group below; other groups still show a placeholder count until Realtime sync is wired
+          (next build step), since their photos live on their own phones, not this one.
         </p>
         <div className="space-y-3">
-          {[{ name: group?.name || "This device (local demo)", count: stationIdx + 1 }, ...groupsList.filter((g) => g.id !== group?.id).map((g) => ({ name: g.name, count: g.current_station_id ?? 1 }))].map((g) => (
-            <div key={g.name}>
-              <p className="text-xs font-semibold text-[#4a4233] mb-1">{g.name} <span className="text-[#a8987a] font-normal">({g.count} photos)</span></p>
+          <div>
+            <p className="text-xs font-semibold text-[#4a4233] mb-1">
+              {group?.name || "This device (local demo)"} <span className="text-[#a8987a] font-normal">({Object.keys(photoUploads).length} photos)</span>
+            </p>
+            {Object.keys(photoUploads).length === 0 ? (
+              <p className="text-[11px] text-[#a8987a] italic">No photos uploaded yet on this device.</p>
+            ) : (
               <div className="flex gap-1.5 overflow-x-auto pb-1">
-                {Array.from({ length: Math.min(g.count, 8) }).map((_, i) => (
+                {Object.entries(photoUploads).map(([key, url]) => (
+                  <div key={key} className="w-12 h-12 shrink-0">
+                    <img src={url} alt={key} className="w-full h-full object-cover rounded-md border border-[#cfc09a]" title={key} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          {groupsList.filter((g) => g.id !== group?.id).map((g) => (
+            <div key={g.name}>
+              <p className="text-xs font-semibold text-[#4a4233] mb-1">{g.name} <span className="text-[#a8987a] font-normal">({g.current_station_id ?? 1} stations reached)</span></p>
+              <div className="flex gap-1.5 overflow-x-auto pb-1">
+                {Array.from({ length: Math.min(g.current_station_id ?? 1, 8) }).map((_, i) => (
                   <div key={i} className="w-12 h-12 shrink-0">
                     <PicturePlaceholder compact />
                   </div>
