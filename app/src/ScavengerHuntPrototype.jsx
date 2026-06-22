@@ -26,6 +26,7 @@ import { supabaseConfigured } from "./lib/supabaseClient";
 import { fetchStations, mergeRemoteStations, updateStationRemote } from "./lib/stationsApi";
 import { joinGroupByCode, fetchGroups } from "./lib/groupsApi";
 import { titleImageUrl, characterImageUrl, nextClueImageUrl } from "./lib/media";
+import { uploadChallengePhoto } from "./lib/uploadsApi";
 
 /* ---------------------------------------------------------------------- */
 /* STATION DATA                                                           */
@@ -612,11 +613,15 @@ function MosaicBuilder() {
   );
 }
 
-function ChallengeProofUpload() {
+function ChallengeProofUpload({ folder }) {
   return (
     <div className="space-y-1.5">
       <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold">Challenge proof</p>
-      <PicturePlaceholder label="Upload your photo" sublabel="proof your group completed this challenge — goes into the City Chronicle album" />
+      <PhotoUploadSlot
+        folder={folder || "challenge"}
+        label="Upload your photo"
+        sublabel="proof your group completed this challenge — goes into the City Chronicle album"
+      />
     </div>
   );
 }
@@ -673,6 +678,85 @@ function PicturePlaceholder({ label, sublabel, tall = false, compact = false, sr
       {sublabel && !compact && (
         <span className="text-[10px] text-[#a8987a] leading-snug">{sublabel}</span>
       )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------------- */
+/* PHOTO UPLOAD SLOT — real camper-submitted photos (found-it proof,      */
+/* challenge proof, group album shots). Tap to pick a file, uploads to    */
+/* the `challenge-photos` Storage bucket, shows the result. Falls back to */
+/* a local-only preview when Supabase isn't configured.                   */
+/* ---------------------------------------------------------------------- */
+function PhotoUploadSlot({ label, sublabel, folder = "misc", tall = false, compact = false, onUploaded }) {
+  const inputRef = React.useRef(null);
+  const [previewUrl, setPreviewUrl] = React.useState(null);
+  const [status, setStatus] = React.useState("idle"); // idle | uploading | uploaded | local-only | error
+  const [errorMsg, setErrorMsg] = React.useState("");
+
+  async function handleFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setPreviewUrl(URL.createObjectURL(file));
+    setStatus("uploading");
+    setErrorMsg("");
+    const { url, error } = await uploadChallengePhoto(file, folder);
+    if (url) {
+      setStatus("uploaded");
+      onUploaded?.(url);
+    } else if (error === "local-only") {
+      setStatus("local-only");
+    } else {
+      setStatus("error");
+      setErrorMsg(error || "Upload failed.");
+    }
+  }
+
+  const sizeClass = compact
+    ? "w-full aspect-square"
+    : tall
+    ? "w-full max-w-[220px] mx-auto aspect-[3/4]"
+    : "w-full max-w-sm mx-auto aspect-[16/10]";
+
+  return (
+    <div className="space-y-1.5">
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className={
+          "relative rounded-xl overflow-hidden text-left block " +
+          sizeClass +
+          (previewUrl ? "" : " border-2 border-dashed border-[#cfc09a] bg-[#e9e1cb]")
+        }
+      >
+        {previewUrl ? (
+          <img src={previewUrl} alt={label || "uploaded photo"} className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-center px-3">
+            <div className="absolute inset-0 opacity-[0.06] [background-image:repeating-linear-gradient(45deg,#2b2620_0,#2b2620_1px,transparent_1px,transparent_10px)]" />
+            <ImagePlus className={compact ? "w-4 h-4 text-[#a8987a]" : "w-6 h-6 text-[#a8987a]"} />
+            {!compact && (
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-[#8a7a5a]">{label}</span>
+            )}
+            {sublabel && !compact && <span className="text-[10px] text-[#a8987a] leading-snug">{sublabel}</span>}
+          </div>
+        )}
+        {status === "uploading" && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs font-semibold">
+            Uploading…
+          </div>
+        )}
+      </button>
+      <input ref={inputRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+      {status === "uploaded" && (
+        <p className="text-[11px] text-emerald-700 flex items-center gap-1">
+          <CheckCircle2 className="w-3 h-3" /> Uploaded
+        </p>
+      )}
+      {status === "local-only" && (
+        <p className="text-[11px] text-[#a8987a]">Saved on this device only — Supabase isn't configured.</p>
+      )}
+      {status === "error" && <p className="text-[11px] text-rose-700">Couldn't upload — {errorMsg} Tap to try again.</p>}
     </div>
   );
 }
@@ -1115,7 +1199,11 @@ function ArrivalProofModal({ targetStation, onSubmit, onCancel }) {
     <Modal onClose={onCancel}>
       <h3 className="quest-display text-lg mb-1">Prove you found it</h3>
       <p className="text-xs text-[#a8987a] mb-4">Station {targetStation.id} — {targetStation.name}</p>
-      <PicturePlaceholder label="Upload your group's photo" sublabel="a quick snap of your group at the spot — staff will check it and unlock the station" />
+      <PhotoUploadSlot
+        folder={`arrival-${targetStation.id}`}
+        label="Upload your group's photo"
+        sublabel="a quick snap of your group at the spot — staff will check it and unlock the station"
+      />
       <div className="flex gap-2 mt-4">
         <button
           onClick={() => onSubmit(targetStation)}
@@ -1321,7 +1409,7 @@ function ClosingScreen({ chronicle, lettersCollected, badges, sword, iceCream, d
         <p className="text-sm text-[#a8987a] uppercase tracking-wide font-semibold mb-5">
           {realFound ? "Sant Jordi's Dragon — found at last" : "Hunt ended early"}
         </p>
-        <PicturePlaceholder label="Final group photo" sublabel="add your group's last photo together, here at the Generalitat" />
+        <PhotoUploadSlot folder="final-group" label="Final group photo" sublabel="add your group's last photo together, here at the Generalitat" />
       </Card>
 
       <Card>
@@ -1654,7 +1742,7 @@ function CamperView({
             <p className="text-[#4a4233] leading-relaxed">{station.challengeText}</p>
             {station.id === 5 && <DrawingPad />}
             {station.id === 11 && <MosaicBuilder />}
-            {station.judging !== "dragon" && station.judging !== "finale" && <ChallengeProofUpload />}
+            {station.judging !== "dragon" && station.judging !== "finale" && <ChallengeProofUpload folder={`challenge-${station.id}`} />}
 
             {isPendingHere ? (
               <div className="flex items-center gap-2 text-sm bg-amber-100 border border-amber-300 rounded-lg px-3 py-2 text-amber-800">
@@ -1738,7 +1826,7 @@ function CamperView({
             <p className="text-[#4a4233] leading-relaxed italic">"{station.crossHistory}"</p>
             <h3 className="text-sm font-semibold text-[#6b5f4a] uppercase tracking-wide">The Challenge</h3>
             <p className="text-[#4a4233] leading-relaxed">{station.crossChallengeText}</p>
-            <ChallengeProofUpload />
+            <ChallengeProofUpload folder={`crossing-${station.id}`} />
             <button onClick={submitCrossingChallenge} className="bg-rose-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-rose-800 transition-colors">
               Identify the creature
             </button>
@@ -1773,7 +1861,7 @@ function CamperView({
                 <PicturePlaceholder src={characterImageUrl(station.id)} label={station.character} sublabel="character" />
               </div>
               <div>
-                <PicturePlaceholder label="Your group" sublabel="add your completed-challenge photo" />
+                <PhotoUploadSlot folder={`group-${station.id}`} label="Your group" sublabel="add your completed-challenge photo" />
               </div>
             </div>
 
