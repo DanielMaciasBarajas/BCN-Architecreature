@@ -25,7 +25,7 @@ import {
 import { supabaseConfigured } from "./lib/supabaseClient";
 import { fetchStations, mergeRemoteStations, updateStationRemote } from "./lib/stationsApi";
 import { joinGroupByCode, fetchGroups } from "./lib/groupsApi";
-import { titleImageUrl, characterImageUrl, nextClueImageUrl } from "./lib/media";
+import { titleImageUrl, characterImageUrl, nextClueImageUrl, archesImageUrl } from "./lib/media";
 import { uploadChallengePhoto } from "./lib/uploadsApi";
 
 /* ---------------------------------------------------------------------- */
@@ -85,7 +85,11 @@ const STATIONS = [
     letter: "A",
     badge: null,
     character: "Isabel la Católica",
-    popsArches: true,
+    hasArchesPrephase: true,
+    archesClueHint:
+      "Look for a long stretch of plain stone wall lined with six blind arches, with a steep wooden-beamed roof rising just behind them — said to be the oldest surviving roof in the city.",
+    archesIntro:
+      "A voice calls out from the shadow of the nearest arch, delighted — \"Well, look who found me before I had to come looking for you! These six arches, this roof — older than anything else still standing in this city. Get your group in close, I want to be in this picture too.\" She waves toward the corner of the square. \"Now go on — round the corner, through the doors, into the courtyard. I'll be waiting at the top of the stairs, same as I was for him.\"",
     meetLine: "standing at the top of the great stone staircase",
     greeting:
       "Do you know whose feet have climbed these steps? Mine, for one — Columbus knelt right where you're standing, back from a voyage that changed how every map in this city was drawn. Show me your group can command a room the way I once did.",
@@ -96,7 +100,7 @@ const STATIONS = [
     factLog: "Plaça del Rei's grand staircase is where tradition says Columbus was received by the Catholic Monarchs after his first voyage in 1493.",
     moral: "Presence",
     farewell:
-      "Decreed and accepted. That's your third letter, A. Now look around you — six arches, right here in this square, though you've only carried letters for three of them so far. Their count isn't an accident. Go now, and find the turtle who's seen every visitor to this square and judged most of them unworthy.",
+      "Decreed and accepted. That's your third letter, A. You've already found the arches outside — six of them, six letters, one word waiting. Go now, and find the turtle who's seen every visitor to this square and judged most of them unworthy.",
     nextArea: "Casa de l'Ardiaca",
     nextClueHint: "Look for a small carved stone turtle set into the wall beside an old wooden mailbox slot.",
   },
@@ -953,9 +957,10 @@ export default function ScavengerHuntPrototype() {
   }
 
   function advanceToNextStation() {
+    const next = stationsData[stationIdx + 1];
     setStationIdx((i) => Math.min(i + 1, stationsData.length - 1));
     setOrderGuess([]);
-    setPhase("meet");
+    setPhase(firstContentPhase(next));
   }
 
   function goToMap() {
@@ -1030,7 +1035,12 @@ export default function ScavengerHuntPrototype() {
   function approveArrival() {
     if (!arrivalPending) return;
     setArrivalApprovals((p) => ({ ...p, [arrivalPending.id]: true }));
-    pushLog(`Staff approved arrival at Station ${arrivalPending.id} (${arrivalPending.name}) — unlocked.`);
+    if (String(arrivalPending.id).endsWith("-arches")) {
+      setArcsPopped(true);
+      pushLog(`Staff approved the Six Arches photo for Station ${String(arrivalPending.id).split("-")[0]} — arches revealed!`);
+    } else {
+      pushLog(`Staff approved arrival at Station ${arrivalPending.id} (${arrivalPending.name}) — unlocked.`);
+    }
     setArrivalPending(null);
   }
 
@@ -1527,11 +1537,19 @@ function ClosingScreen({ chronicle, lettersCollected, badges, sword, iceCream, d
 const PHASE_ORDER_DEFAULT = ["meet", "history", "challenge", "resolved", "travel"];
 const PHASE_ORDER_BRIDGE = ["meet", "history", "challenge", "bridge", "swordpuzzle", "resolved", "pitstop", "travel"];
 const PHASE_ORDER_PALACE = ["meet", "history", "challenge", "tip", "crossing", "resolved", "travel"];
+const PHASE_ORDER_ARCHES = ["arches", "meet", "history", "challenge", "resolved", "travel"];
 
 function getPhaseOrder(station) {
   if (station.judging === "bridge") return PHASE_ORDER_BRIDGE;
   if (station.judging === "palace") return PHASE_ORDER_PALACE;
+  if (station.hasArchesPrephase) return PHASE_ORDER_ARCHES;
   return PHASE_ORDER_DEFAULT;
+}
+
+/* The content phase a station opens on — "arches" for stations with an
+   exterior find-it sub-phase (e.g. Station 3), "meet" otherwise. */
+function firstContentPhase(station) {
+  return station && station.hasArchesPrephase ? "arches" : "meet";
 }
 
 function StepDots({ station, phase }) {
@@ -1756,8 +1774,30 @@ function CamperView({
               arrivalPending={arrivalPending}
               arrivalApprovals={arrivalApprovals}
               onOpenModal={setArrivalModalTarget}
-              onContinue={() => setPhase("meet")}
+              onContinue={() => setPhase(firstContentPhase(station))}
               continueLabel={`Arrived — meet ${station.character}`}
+            />
+          </div>
+        )}
+
+        {phase === "arches" && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-[#6b5f4a] uppercase tracking-wide flex items-center gap-1.5">
+              <Compass className="w-4 h-4" /> The Exterior — Six Arches
+            </h3>
+            <div className="space-y-1.5">
+              <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold">Find this</p>
+              <PicturePlaceholder src={archesImageUrl(station.id)} label="The Six Arches" sublabel={station.archesClueHint} />
+            </div>
+            <p className="text-[#4a4233] leading-relaxed italic">"{station.archesIntro}"</p>
+            <p className="text-xs text-[#a8987a]">Snap your group in front of it — staff will check it and reveal the arches in your Collection.</p>
+            <ArrivalGate
+              targetStation={{ id: `${station.id}-arches`, name: "the Six Arches", character: station.character }}
+              arrivalPending={arrivalPending}
+              arrivalApprovals={arrivalApprovals}
+              onOpenModal={setArrivalModalTarget}
+              onContinue={() => setPhase("meet")}
+              continueLabel="Onward — round to the courtyard"
             />
           </div>
         )}

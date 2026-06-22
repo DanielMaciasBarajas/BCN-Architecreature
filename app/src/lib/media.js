@@ -43,3 +43,12 @@ export function characterImageUrl(stationId) {
 export function nextClueImageUrl(stationId) {
   return stationMediaUrls(`${stationId}-next-clue`);
 }
+
+/**
+ * Reference photo for a sub-phase site within a station — e.g. the exterior
+ * "six arches" wall outside Plaça del Rei, found before the main interior
+ * content. Upload as `${stationId}-arches.png` (or .jpeg/.jpg) in Storage.
+ */
+export function archesImageUrl(stationId) {
+  return stationMediaUrls(`${stationId}-arches`);
+}
