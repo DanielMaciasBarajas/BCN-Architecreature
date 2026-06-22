@@ -1134,6 +1134,7 @@ export default function ScavengerHuntPrototype() {
             submitChallenge={submitChallenge}
             submitCrossingChallenge={submitCrossingChallenge}
             recordPhotoUpload={recordPhotoUpload}
+            photoUploads={photoUploads}
             advanceToNextStation={advanceToNextStation}
             goToMap={goToMap}
             finaleDone={finaleDone}
@@ -1678,6 +1679,7 @@ function CamperView({
   submitChallenge,
   submitCrossingChallenge,
   recordPhotoUpload,
+  photoUploads = {},
   advanceToNextStation,
   goToMap,
   finaleDone,
@@ -1894,12 +1896,16 @@ function CamperView({
                 <PicturePlaceholder src={characterImageUrl(station.id)} label={station.character} sublabel="character" />
               </div>
               <div>
-                <PhotoUploadSlot
-                  folder={`group-${station.id}`}
-                  label="Your group"
-                  sublabel="add your completed-challenge photo"
-                  onUploaded={(url) => recordPhotoUpload(`group-${station.id}`, url)}
-                />
+                {photoUploads[`challenge-${station.id}`] ? (
+                  <PicturePlaceholder src={photoUploads[`challenge-${station.id}`]} label="Your group" sublabel="submitted with the challenge" />
+                ) : (
+                  <PhotoUploadSlot
+                    folder={`group-${station.id}`}
+                    label="Your group"
+                    sublabel="add your completed-challenge photo"
+                    onUploaded={(url) => recordPhotoUpload(`group-${station.id}`, url)}
+                  />
+                )}
               </div>
             </div>
 
