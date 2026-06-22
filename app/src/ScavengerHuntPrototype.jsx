@@ -400,7 +400,9 @@ function DrawingPad() {
   function getPos(e, canvas) {
     const rect = canvas.getBoundingClientRect();
     const point = e.touches ? e.touches[0] : e;
-    return { x: point.clientX - rect.left, y: point.clientY - rect.top };
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return { x: (point.clientX - rect.left) * scaleX, y: (point.clientY - rect.top) * scaleY };
   }
 
   function startDraw(e) {
@@ -538,7 +540,24 @@ function MosaicBuilder() {
     setActiveColor(c);
   }
 
-  function paintCell(i) {
+  function paintAtPoint(clientX, clientY) {
+    const el = document.elementFromPoint(clientX, clientY);
+    const idx = el?.dataset?.idx;
+    if (idx !== undefined) paintCell(Number(idx));
+  }
+
+  function handleTouchStart(e) {
+    paintingRef.current = true;
+    const t = e.touches[0];
+    if (t) paintAtPoint(t.clientX, t.clientY);
+  }
+
+  function handleTouchMove(e) {
+    if (!paintingRef.current) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    if (t) paintAtPoint(t.clientX, t.clientY);
+  }
     if (!activeColor) return;
     setCells((p) => {
       const next = [...p];
@@ -592,6 +611,9 @@ function MosaicBuilder() {
         onMouseDown={() => (paintingRef.current = true)}
         onMouseUp={() => (paintingRef.current = false)}
         onMouseLeave={() => (paintingRef.current = false)}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={() => (paintingRef.current = false)}
       >
         {cells.map((c, i) => {
           const r = Math.floor(i / MOSAIC_COLS);
@@ -600,6 +622,7 @@ function MosaicBuilder() {
           return (
             <button
               key={i}
+              data-idx={i}
               onMouseDown={() => paintCell(i)}
               onMouseEnter={() => paintingRef.current && paintCell(i)}
               className="aspect-square rounded-[2px]"
@@ -608,7 +631,7 @@ function MosaicBuilder() {
           );
         })}
       </div>
-      <p className="text-[11px] text-[#a8987a] italic">Click and drag to paint. The faint shape is just a guide — make it your own.</p>
+      <p className="text-[11px] text-[#a8987a] italic">Tap and drag to paint. The faint shape is just a guide — make it your own.</p>
     </div>
   );
 }
@@ -948,6 +971,7 @@ export default function ScavengerHuntPrototype() {
       if (photoUrl) recordPhotoUpload(`challenge-${station.id}`, photoUrl);
       pushLog(`Submitted to staff for approval: Station ${station.id} (Palau Güell).`);
     } else if (station.judging === "auto") {
+      if (photoUrl) recordPhotoUpload(`challenge-${station.id}`, photoUrl);
       awardStation(station);
     } else if (station.judging === "dragon") {
       setDragonCards((p) => ({ ...p, [station.id]: "x" }));
@@ -962,6 +986,7 @@ export default function ScavengerHuntPrototype() {
       setPhase("resolved");
     } else if (station.judging === "bridge") {
       // blindfold challenge complete -> badge now, then bridge intermission
+      if (photoUrl) recordPhotoUpload(`challenge-${station.id}`, photoUrl);
       if (station.badge) setBadges((p) => Array.from(new Set([...p, station.badge])));
       pushLog("Pin the Skull complete — the Watcher has something to say.");
       setPhase("bridge");
@@ -2012,6 +2037,7 @@ function CamperView({
         badges={badges}
         dragonCards={dragonCards}
         chronicle={chronicle}
+        photoUploads={photoUploads}
       />
     </div>
   );
@@ -2020,9 +2046,10 @@ function CamperView({
 /* ---------------------------------------------------------------------- */
 /* COLLECTION AREA                                                        */
 /* ---------------------------------------------------------------------- */
-function CollectionArea({ act, lettersCollected, arcsPopped, sword, iceCream, badges, dragonCards, chronicle }) {
+function CollectionArea({ act, lettersCollected, arcsPopped, sword, iceCream, badges, dragonCards, chronicle, photoUploads = {} }) {
   const showHunt = act === 2 || Object.keys(dragonCards).length > 0;
   const foundCount = Object.keys(dragonCards).length;
+  const [lightbox, setLightbox] = React.useState(null); // {src, label} | null
 
   return (
     <div className="rounded-2xl border border-[#cfc09a] bg-gradient-to-b from-[#FBF6E8] to-[#F1E9D8] p-5 shadow-sm">
@@ -2123,21 +2150,42 @@ function CollectionArea({ act, lettersCollected, arcsPopped, sword, iceCream, ba
           <p className="text-xs text-[#a8987a] italic">No history recorded yet.</p>
         ) : (
           <ul className="text-xs text-[#4a4233] space-y-2.5">
-            {chronicle.map((c, i) => (
-              <li key={i} className="flex gap-2.5">
-                <div className="w-12 h-12 shrink-0">
-                  <PicturePlaceholder src={nextClueImageUrl(c.id)} compact />
-                </div>
-                <div>
-                  <span className="font-semibold">{c.id}. {c.name}</span> — {c.fact}
-                  <br />
-                  <span className="text-[#8a7a5a] italic">Moral: {c.moral}</span>
-                </div>
-              </li>
-            ))}
+            {chronicle.map((c, i) => {
+              const thumbSrc = photoUploads[`arrival-${c.id}`] || nextClueImageUrl(c.id);
+              return (
+                <li key={i} className="flex gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setLightbox({ src: thumbSrc, label: `${c.id}. ${c.name}` })}
+                    className="w-12 h-12 shrink-0 rounded-md overflow-hidden hover:opacity-80 hover:scale-105 transition-transform cursor-zoom-in"
+                    aria-label={`Expand photo for ${c.name}`}
+                  >
+                    <PicturePlaceholder src={thumbSrc} compact />
+                  </button>
+                  <div>
+                    <span className="font-semibold">{c.id}. {c.name}</span> — {c.fact}
+                    <br />
+                    <span className="text-[#8a7a5a] italic">Moral: {c.moral}</span>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
+
+      {lightbox && (
+        <Modal onClose={() => setLightbox(null)}>
+          <p className="text-xs font-semibold text-[#4a4233] mb-2">{lightbox.label}</p>
+          <img src={lightbox.src} alt={lightbox.label} className="w-full rounded-lg object-cover" />
+          <button
+            onClick={() => setLightbox(null)}
+            className="mt-3 w-full border border-[#cfc09a] rounded-full px-4 py-2 text-sm hover:bg-[#e3d8bc]"
+          >
+            Close
+          </button>
+        </Modal>
+      )}
     </div>
   );
 }
@@ -2399,13 +2447,14 @@ function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsLi
   return (
     <div className="space-y-5 quest-body">
       <Card>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
           <h2 className="quest-display text-lg flex items-center gap-2">
             <LayoutDashboard className="w-5 h-5" /> Group progress
           </h2>
           <SyncStatusBadge status={groupsSyncStatus} />
         </div>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto -mx-1 px-1">
+          <table className="w-full text-sm min-w-[480px]">
           <thead>
             <tr className="text-left text-[#6b5f4a] border-b border-[#e3d8bc]">
               <th className="py-2">Group</th>
@@ -2449,6 +2498,7 @@ function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsLi
             )}
           </tbody>
         </table>
+        </div>
       </Card>
 
       <Card>
@@ -2458,12 +2508,12 @@ function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsLi
         </p>
         <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
           {stationsData.map((s) => (
-            <div key={s.id} className="flex items-center gap-3 border border-[#e3d8bc] rounded-lg px-3 py-2">
-              <span className="text-xs w-40 shrink-0 font-medium">{s.id}. {s.character}</span>
-              <button className="flex items-center gap-1 text-[11px] border border-dashed border-[#cfc09a] rounded-md px-2 py-1 text-[#8a7a5a] hover:bg-[#e3d8bc]">
+            <div key={s.id} className="flex items-center gap-3 border border-[#e3d8bc] rounded-lg px-3 py-2 overflow-x-auto">
+              <span className="text-xs w-32 shrink-0 font-medium">{s.id}. {s.character}</span>
+              <button className="shrink-0 flex items-center gap-1 text-[11px] border border-dashed border-[#cfc09a] rounded-md px-2 py-1 text-[#8a7a5a] hover:bg-[#e3d8bc]">
                 <ImagePlus className="w-3 h-3" /> Character photo
               </button>
-              <button className="flex items-center gap-1 text-[11px] border border-dashed border-[#cfc09a] rounded-md px-2 py-1 text-[#8a7a5a] hover:bg-[#e3d8bc]">
+              <button className="shrink-0 flex items-center gap-1 text-[11px] border border-dashed border-[#cfc09a] rounded-md px-2 py-1 text-[#8a7a5a] hover:bg-[#e3d8bc]">
                 <ImagePlus className="w-3 h-3" /> Clue close-up
               </button>
             </div>
@@ -2557,13 +2607,13 @@ function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsLi
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2">
+                <div className="flex items-center justify-between flex-wrap gap-2 text-sm">
+                  <span className="flex items-center gap-2 min-w-0">
                     <StationBadgeDot act={s.act} />
-                    {s.id}. {s.name}
-                    <span className="text-xs text-[#a8987a] uppercase">({s.judging})</span>
+                    <span className="truncate">{s.id}. {s.name}</span>
+                    <span className="text-xs text-[#a8987a] uppercase shrink-0">({s.judging})</span>
                   </span>
-                  <button onClick={() => startEdit(s)} className="text-xs border border-[#cfc09a] rounded-full px-3 py-1 hover:bg-[#e3d8bc]">
+                  <button onClick={() => startEdit(s)} className="shrink-0 text-xs border border-[#cfc09a] rounded-full px-3 py-1 hover:bg-[#e3d8bc]">
                     Edit
                   </button>
                 </div>
