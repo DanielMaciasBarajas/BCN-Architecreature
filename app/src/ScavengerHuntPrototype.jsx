@@ -25,7 +25,7 @@ import {
 import { supabaseConfigured } from "./lib/supabaseClient";
 import { fetchStations, mergeRemoteStations, updateStationRemote } from "./lib/stationsApi";
 import { joinGroupByCode, fetchGroups } from "./lib/groupsApi";
-import { characterImageUrl, nextClueImageUrl } from "./lib/media";
+import { titleImageUrl, characterImageUrl, nextClueImageUrl } from "./lib/media";
 
 /* ---------------------------------------------------------------------- */
 /* STATION DATA                                                           */
@@ -728,7 +728,7 @@ export default function ScavengerHuntPrototype() {
   }); // join -> intro -> instructions -> hunt -> closing
 
   const [stationIdx, setStationIdx] = useState(0);
-  const [phase, setPhase] = useState("meet"); // meet -> history -> challenge -> [bridge -> swordpuzzle ->] resolved -> travel
+  const [phase, setPhase] = useState("arrive"); // arrive -> meet -> history -> challenge -> [bridge -> swordpuzzle ->] resolved -> travel
   const [lettersCollected, setLettersCollected] = useState([]);
   const [arcsPopped, setArcsPopped] = useState(false);
   const [sword, setSword] = useState(false);
@@ -922,7 +922,7 @@ export default function ScavengerHuntPrototype() {
 
   function resetAll() {
     setStationIdx(0);
-    setPhase("meet");
+    setPhase("arrive");
     setLettersCollected([]);
     setArcsPopped(false);
     setSword(false);
@@ -981,7 +981,7 @@ export default function ScavengerHuntPrototype() {
         )}
 
         {role === "camper" && screen === "intro" && (
-          <IntroScreen onBegin={() => setScreen("instructions")} groupName={group?.name} firstStation={stationsData[0]} />
+          <IntroScreen onBegin={() => setScreen("instructions")} groupName={group?.name} />
         )}
 
         {role === "camper" && screen === "instructions" && (
@@ -1135,7 +1135,7 @@ function JoinScreen({ onJoin }) {
 /* ---------------------------------------------------------------------- */
 /* INTRO SCREEN                                                           */
 /* ---------------------------------------------------------------------- */
-function IntroScreen({ onBegin, groupName, firstStation }) {
+function IntroScreen({ onBegin, groupName }) {
   return (
     <div className="space-y-5 quest-body">
       <Card className="text-center py-10">
@@ -1150,22 +1150,11 @@ function IntroScreen({ onBegin, groupName, firstStation }) {
         <p className="text-[#4a4233] leading-relaxed max-w-md mx-auto mb-2">
           Something is hiding in this city — something that has worn many faces, in many places, for a very long time.
         </p>
-        <p className="text-[#4a4233] leading-relaxed max-w-md mx-auto mb-6">
+        <p className="text-[#4a4233] leading-relaxed max-w-md mx-auto mb-8">
           Before your group can hunt it, you'll need to understand what you're looking for. Six arches. Six letters.
           One quest, then the HUNT begins.
         </p>
-        {firstStation && (
-          <div className="space-y-1.5 max-w-sm mx-auto text-left mb-2">
-            <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold text-center">
-              Head out and spot this at {firstStation.name}
-            </p>
-            <PicturePlaceholder
-              src={nextClueImageUrl(firstStation.id)}
-              label={`Something at ${firstStation.name}`}
-              sublabel={firstStation.nextClueHint}
-            />
-          </div>
-        )}
+        <PicturePlaceholder src={titleImageUrl()} label="Title illustration" sublabel="a wall carved with heraldic signs, somewhere in the old quarter" tall={false} />
         <button
           onClick={onBegin}
           className="mt-8 inline-flex items-center justify-center gap-1.5 bg-[#2b2620] text-amber-300 rounded-full px-7 py-3 text-sm font-semibold hover:bg-[#3a332a] transition-colors"
@@ -1471,7 +1460,7 @@ function CamperView({
   const nextStation = stationsData[stationIdx + 1];
   const [spottedClue, setSpottedClue] = React.useState(false);
   React.useEffect(() => {
-    if (phase === "travel") setSpottedClue(false);
+    if (phase === "travel" || phase === "arrive") setSpottedClue(false);
   }, [phase, stationIdx]);
 
   return (
@@ -1489,8 +1478,33 @@ function CamperView({
 
       <Card>
         <p className="text-xs uppercase tracking-wide text-[#a8987a] font-semibold mb-1">{station.name}</p>
-        <StepDots station={station} phase={phase} />
-        <BackButton station={station} phase={phase} setPhase={setPhase} />
+        {phase !== "arrive" && <StepDots station={station} phase={phase} />}
+        {phase !== "arrive" && <BackButton station={station} phase={phase} setPhase={setPhase} />}
+
+        {phase === "arrive" && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-[#6b5f4a] uppercase tracking-wide flex items-center gap-1.5">
+              <Compass className="w-4 h-4" /> Heading to {station.name}
+            </h3>
+            <MiniMap fromStation={null} toStation={station} />
+            <div className="space-y-1.5">
+              <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold">Keep an eye out for</p>
+              <PicturePlaceholder src={nextClueImageUrl(station.id)} label={`Something at ${station.name}`} sublabel="Find this before your group can begin." />
+            </div>
+            <p className="text-xs text-[#a8987a]">Once your group has arrived AND spotted it, you're ready to begin.</p>
+            <label className="flex items-center gap-2 text-sm text-[#4a4233] cursor-pointer">
+              <input type="checkbox" checked={spottedClue} onChange={(e) => setSpottedClue(e.target.checked)} className="w-4 h-4" />
+              We found it!
+            </label>
+            <button
+              onClick={() => setPhase("meet")}
+              disabled={!spottedClue}
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-amber-600 text-white rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-amber-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Arrived — meet {station.character} <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {phase === "meet" && (
           <div className="space-y-4">
