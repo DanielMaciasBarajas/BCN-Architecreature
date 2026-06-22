@@ -642,8 +642,8 @@ function PicturePlaceholder({ label, sublabel, tall = false, compact = false, sr
     return (
       <div
         className={
-          "relative w-full rounded-xl overflow-hidden bg-[#e9e1cb] " +
-          (compact ? "aspect-square" : tall ? "aspect-[3/4]" : "aspect-[16/10]")
+          "relative rounded-xl overflow-hidden bg-[#e9e1cb] " +
+          (compact ? "w-full aspect-square" : tall ? "w-full max-w-[220px] mx-auto aspect-[3/4]" : "w-full max-w-sm mx-auto aspect-[16/10]")
         }
       >
         <img
@@ -659,8 +659,8 @@ function PicturePlaceholder({ label, sublabel, tall = false, compact = false, sr
   return (
     <div
       className={
-        "relative w-full rounded-xl border-2 border-dashed border-[#cfc09a] bg-[#e9e1cb] flex flex-col items-center justify-center gap-1.5 overflow-hidden text-center px-3 " +
-        (compact ? "aspect-square" : tall ? "aspect-[3/4]" : "aspect-[16/10]")
+        "relative rounded-xl border-2 border-dashed border-[#cfc09a] bg-[#e9e1cb] flex flex-col items-center justify-center gap-1.5 overflow-hidden text-center px-3 " +
+        (compact ? "w-full aspect-square" : tall ? "w-full max-w-[220px] mx-auto aspect-[3/4]" : "w-full max-w-sm mx-auto aspect-[16/10]")
       }
     >
       <div className="absolute inset-0 opacity-[0.06] [background-image:repeating-linear-gradient(45deg,#2b2620_0,#2b2620_1px,transparent_1px,transparent_10px)]" />
@@ -736,6 +736,8 @@ export default function ScavengerHuntPrototype() {
   const [badges, setBadges] = useState([]);
   const [iceCream, setIceCream] = useState(false);
   const [pending, setPending] = useState(null);
+  const [arrivalPending, setArrivalPending] = useState(null); // station awaiting staff approval of found-it photo
+  const [arrivalApprovals, setArrivalApprovals] = useState({}); // {stationId: true} once staff has unlocked it
   const [orderGuess, setOrderGuess] = useState([]);
   const [finaleDone, setFinaleDone] = useState(false);
   const [log, setLog] = useState([]);
@@ -897,6 +899,24 @@ export default function ScavengerHuntPrototype() {
     setPending(null);
   }
 
+  function submitArrivalProof(targetStation) {
+    setArrivalPending(targetStation);
+    pushLog(`Submitted found-it photo for staff approval: Station ${targetStation.id} (${targetStation.name}).`);
+  }
+
+  function approveArrival() {
+    if (!arrivalPending) return;
+    setArrivalApprovals((p) => ({ ...p, [arrivalPending.id]: true }));
+    pushLog(`Staff approved arrival at Station ${arrivalPending.id} (${arrivalPending.name}) — unlocked.`);
+    setArrivalPending(null);
+  }
+
+  function rejectArrivalProof() {
+    if (!arrivalPending) return;
+    pushLog(`Staff sent back the found-it photo for Station ${arrivalPending.id} — ask the group to try again.`);
+    setArrivalPending(null);
+  }
+
   function toggleLetter(letter, idx) {
     setOrderGuess((p) => [...p, { letter, idx }]);
   }
@@ -930,6 +950,8 @@ export default function ScavengerHuntPrototype() {
     setBadges([]);
     setIceCream(false);
     setPending(null);
+    setArrivalPending(null);
+    setArrivalApprovals({});
     setOrderGuess([]);
     setFinaleDone(false);
     setLog([]);
@@ -1003,6 +1025,9 @@ export default function ScavengerHuntPrototype() {
             badges={badges}
             iceCream={iceCream}
             pending={pending}
+            arrivalPending={arrivalPending}
+            arrivalApprovals={arrivalApprovals}
+            submitArrivalProof={submitArrivalProof}
             orderGuess={orderGuess}
             usedIdx={usedIdx}
             toggleLetter={toggleLetter}
@@ -1031,7 +1056,16 @@ export default function ScavengerHuntPrototype() {
         )}
 
         {role === "staff" && (
-          <StaffView pending={pending} approvePending={approvePending} rejectPending={rejectPending} station={station} log={log} />
+                    <StaffView
+            pending={pending}
+            approvePending={approvePending}
+            rejectPending={rejectPending}
+            arrivalPending={arrivalPending}
+            approveArrival={approveArrival}
+            rejectArrivalProof={rejectArrivalProof}
+            station={station}
+            log={log}
+          />
         )}
 
         {role === "admin" && (
@@ -1058,6 +1092,43 @@ export default function ScavengerHuntPrototype() {
 
 function Card({ children, className = "" }) {
   return <div className={"bg-[#FBF6E8] border border-[#cfc09a] rounded-xl p-5 shadow-sm " + className}>{children}</div>;
+}
+
+/* ---------------------------------------------------------------------- */
+/* MODAL — generic overlay used for the found-it proof upload             */
+/* ---------------------------------------------------------------------- */
+function Modal({ children, onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8" onClick={onClose}>
+      <div
+        className="w-full max-w-sm bg-[#FBF6E8] border border-[#cfc09a] rounded-xl p-5 shadow-lg max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function ArrivalProofModal({ targetStation, onSubmit, onCancel }) {
+  return (
+    <Modal onClose={onCancel}>
+      <h3 className="quest-display text-lg mb-1">Prove you found it</h3>
+      <p className="text-xs text-[#a8987a] mb-4">Station {targetStation.id} — {targetStation.name}</p>
+      <PicturePlaceholder label="Upload your group's photo" sublabel="a quick snap of your group at the spot — staff will check it and unlock the station" />
+      <div className="flex gap-2 mt-4">
+        <button
+          onClick={() => onSubmit(targetStation)}
+          className="flex-1 bg-emerald-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-emerald-800 transition-colors"
+        >
+          Submit for approval
+        </button>
+        <button onClick={onCancel} className="border border-[#cfc09a] rounded-full px-4 py-2 text-sm hover:bg-[#e3d8bc]">
+          Cancel
+        </button>
+      </div>
+    </Modal>
+  );
 }
 
 /* ---------------------------------------------------------------------- */
@@ -1404,23 +1475,64 @@ function MiniMap({ fromStation, toStation }) {
     .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
     .join(" ");
 
-  const zoom = 190;
+  const zoom = 320;
   const viewBox = `${toPt.x - zoom / 2} ${toPt.y - zoom / 2} ${zoom} ${zoom}`;
 
   return (
-    <svg viewBox={viewBox} className="w-full aspect-square rounded-xl border border-[#cfc09a] bg-[#EFE6CC]">
+    <svg viewBox={viewBox} className="w-full max-w-sm mx-auto aspect-square rounded-xl border border-[#cfc09a] bg-[#EFE6CC] block">
       <path d={pathD} fill="none" stroke="#a8987a" strokeWidth="1.2" strokeDasharray="2 2" />
       {points.map((p) => (
-        <circle key={p.id} cx={p.x} cy={p.y} r={3} fill="#cfc09a" stroke="#8a7a5a" strokeWidth="0.6" />
+        <circle key={p.id} cx={p.x} cy={p.y} r={4} fill="#cfc09a" stroke="#8a7a5a" strokeWidth="0.8" />
       ))}
       {fromStation && (
-        <circle cx={fromPt.x} cy={fromPt.y} r={5} fill="#d97706" stroke="#92400e" strokeWidth="1" />
+        <circle cx={fromPt.x} cy={fromPt.y} r={6} fill="#d97706" stroke="#92400e" strokeWidth="1.2" />
       )}
-      <circle cx={toPt.x} cy={toPt.y} r={7} fill="#b91c1c" stroke="#7f1d1d" strokeWidth="1" className="pulse-dot" />
-      <text x={toPt.x} y={toPt.y - 12} textAnchor="middle" fontSize="6" fontWeight="700" fill="#2b2620">
+      <circle cx={toPt.x} cy={toPt.y} r={9} fill="#b91c1c" stroke="#7f1d1d" strokeWidth="1.2" className="pulse-dot" />
+      <text x={toPt.x} y={toPt.y - 16} textAnchor="middle" fontSize="10" fontWeight="700" fill="#2b2620">
         {toStation.id}. {toStation.name}
       </text>
     </svg>
+  );
+}
+
+/* Found-it gate: shown at the bottom of the "arrive" and "travel" phases.
+   Walks a group from "I see it" through staff approval to unlocking the
+   next step — replaces the old self-reported checkbox. */
+function ArrivalGate({ targetStation, arrivalPending, arrivalApprovals, onOpenModal, onContinue, continueLabel }) {
+  const approved = !!arrivalApprovals[targetStation.id];
+  const awaitingApproval = arrivalPending && arrivalPending.id === targetStation.id;
+
+  return (
+    <div className="space-y-3">
+      {!approved && !awaitingApproval && (
+        <button
+          onClick={() => onOpenModal(targetStation)}
+          className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-rose-700 text-white rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-rose-800 transition-colors"
+        >
+          <ImagePlus className="w-4 h-4" /> We found it — upload proof
+        </button>
+      )}
+
+      {awaitingApproval && (
+        <div className="flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-3 py-2.5 text-sm text-amber-900">
+          <CloudCheck className="w-4 h-4 shrink-0" /> Photo submitted — waiting for staff to approve and unlock.
+        </div>
+      )}
+
+      {approved && (
+        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-300 rounded-lg px-3 py-2.5 text-sm text-emerald-900">
+          <CheckCircle2 className="w-4 h-4 shrink-0" /> Approved by staff — you're clear to continue.
+        </div>
+      )}
+
+      <button
+        onClick={onContinue}
+        disabled={!approved}
+        className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-amber-600 text-white rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-amber-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {continueLabel} <ArrowRight className="w-4 h-4" />
+      </button>
+    </div>
   );
 }
 
@@ -1441,6 +1553,9 @@ function CamperView({
   badges,
   iceCream,
   pending,
+  arrivalPending,
+  arrivalApprovals,
+  submitArrivalProof,
   orderGuess,
   usedIdx,
   toggleLetter,
@@ -1458,10 +1573,7 @@ function CamperView({
   const isFinale = station.judging === "finale";
   const isLastStation = stationIdx === total - 1;
   const nextStation = stationsData[stationIdx + 1];
-  const [spottedClue, setSpottedClue] = React.useState(false);
-  React.useEffect(() => {
-    if (phase === "travel" || phase === "arrive") setSpottedClue(false);
-  }, [phase, stationIdx]);
+  const [arrivalModalTarget, setArrivalModalTarget] = React.useState(null);
 
   return (
     <div className="space-y-5 quest-body">
@@ -1491,18 +1603,15 @@ function CamperView({
               <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold">Keep an eye out for</p>
               <PicturePlaceholder src={nextClueImageUrl(station.id)} label={`Something at ${station.name}`} sublabel="Find this before your group can begin." />
             </div>
-            <p className="text-xs text-[#a8987a]">Once your group has arrived AND spotted it, you're ready to begin.</p>
-            <label className="flex items-center gap-2 text-sm text-[#4a4233] cursor-pointer">
-              <input type="checkbox" checked={spottedClue} onChange={(e) => setSpottedClue(e.target.checked)} className="w-4 h-4" />
-              We found it!
-            </label>
-            <button
-              onClick={() => setPhase("meet")}
-              disabled={!spottedClue}
-              className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-amber-600 text-white rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-amber-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Arrived — meet {station.character} <ArrowRight className="w-4 h-4" />
-            </button>
+            <p className="text-xs text-[#a8987a]">Once your group has arrived and spotted it, upload a photo to prove it — staff will check it and unlock the station.</p>
+            <ArrivalGate
+              targetStation={station}
+              arrivalPending={arrivalPending}
+              arrivalApprovals={arrivalApprovals}
+              onOpenModal={setArrivalModalTarget}
+              onContinue={() => setPhase("meet")}
+              continueLabel={`Arrived — meet ${station.character}`}
+            />
           </div>
         )}
 
@@ -1738,21 +1847,29 @@ function CamperView({
                 <PicturePlaceholder src={nextClueImageUrl(nextStation.id)} label={`Something at ${nextStation.name}`} sublabel={station.nextClueHint} />
               </div>
             )}
-            <p className="text-xs text-[#a8987a]">Once your group has arrived AND spotted it, you're ready to begin.</p>
-            <label className="flex items-center gap-2 text-sm text-[#4a4233] cursor-pointer">
-              <input type="checkbox" checked={spottedClue} onChange={(e) => setSpottedClue(e.target.checked)} className="w-4 h-4" />
-              We found it!
-            </label>
-            <button
-              onClick={advanceToNextStation}
-              disabled={!!station.nextClueHint && !spottedClue}
-              className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-amber-600 text-white rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-amber-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Arrived — meet {nextStation.character} <ArrowRight className="w-4 h-4" />
-            </button>
+            <p className="text-xs text-[#a8987a]">Once your group has arrived and spotted it, upload a photo to prove it — staff will check it and unlock the station.</p>
+            <ArrivalGate
+              targetStation={nextStation}
+              arrivalPending={arrivalPending}
+              arrivalApprovals={arrivalApprovals}
+              onOpenModal={setArrivalModalTarget}
+              onContinue={advanceToNextStation}
+              continueLabel={`Arrived — meet ${nextStation.character}`}
+            />
           </div>
         )}
       </Card>
+
+      {arrivalModalTarget && (
+        <ArrivalProofModal
+          targetStation={arrivalModalTarget}
+          onCancel={() => setArrivalModalTarget(null)}
+          onSubmit={(target) => {
+            submitArrivalProof(target);
+            setArrivalModalTarget(null);
+          }}
+        />
+      )}
 
       <CollectionArea
         act={station.act}
@@ -2007,9 +2124,31 @@ function FinaleSummary({ dragonCards, badges }) {
   );
 }
 
-function StaffView({ pending, approvePending, rejectPending, station, log }) {
+function StaffView({ pending, approvePending, rejectPending, arrivalPending, approveArrival, rejectArrivalProof, station, log }) {
   return (
     <div className="space-y-5 quest-body">
+      <Card>
+        <h2 className="quest-display text-lg mb-3 flex items-center gap-2">
+          <ShieldCheck className="w-5 h-5" /> Found-it photo queue
+        </h2>
+        {arrivalPending ? (
+          <div className="border border-amber-300 bg-amber-50 rounded-lg p-4">
+            <p className="text-sm text-[#4a4233] mb-1 font-semibold">Station {arrivalPending.id} — {arrivalPending.name}</p>
+            <p className="text-sm text-[#6b5f4a] mb-3">Group submitted a photo proving they found this station. Check it, then unlock the station.</p>
+            <div className="flex gap-2">
+              <button onClick={approveArrival} className="bg-emerald-700 text-white rounded-full px-4 py-1.5 text-sm font-semibold hover:bg-emerald-800">
+                Approve &amp; unlock
+              </button>
+              <button onClick={rejectArrivalProof} className="border border-rose-400 text-rose-700 rounded-full px-4 py-1.5 text-sm font-semibold hover:bg-rose-50">
+                Send back
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-[#8a7a5a]">No found-it photos waiting right now.</p>
+        )}
+      </Card>
+
       <Card>
         <h2 className="quest-display text-lg mb-3 flex items-center gap-2">
           <ShieldCheck className="w-5 h-5" /> Approval queue

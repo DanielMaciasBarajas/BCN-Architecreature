@@ -33,7 +33,7 @@ function stationMediaUrls(basename) {
 }
 
 export function titleImageUrl() {
-  return stationMediaUrls("title");
+  return stationMediaUrls("intro");
 }
 
 export function characterImageUrl(stationId) {
