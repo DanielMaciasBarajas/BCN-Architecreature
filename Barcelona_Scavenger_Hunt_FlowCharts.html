@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Barcelona Scavenger Hunt — Flow Charts</title>
+<style>
+  :root{ --ink:#1a1a1a; --line:#cccccc; --muted:#666666; --panel:#f4f4f4; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#fff;color:var(--ink);}
+  header{padding:20px 28px 14px;border-bottom:1px solid var(--ink);}
+  header h1{margin:0 0 4px;font-size:20px;font-weight:600;}
+  header p{margin:0 0 4px;font-size:12px;color:var(--muted);}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+  .tabs button{font-size:12px;border:1px solid var(--ink);background:#fff;padding:6px 12px;cursor:pointer;}
+  .tabs button.active{background:var(--ink);color:#fff;}
+  .tabs button:hover{background:#eee;}
+  .tabs button.active:hover{background:var(--ink);}
+  main{padding:24px 28px 60px;overflow-x:auto;}
+  .flow-title{font-size:14px;font-weight:600;margin:0 0 4px;}
+  .flow-sub{font-size:12px;color:var(--muted);margin:0 0 18px;max-width:900px;}
+  .flow{display:flex;align-items:stretch;gap:0;min-width:max-content;}
+  .node{border:1px solid var(--ink);background:#fff;width:185px;min-height:128px;padding:8px;
+    display:flex;flex-direction:column;justify-content:flex-start;flex-shrink:0;}
+  .node.skip{background:var(--panel);}
+  .node .n{font-size:10px;color:var(--muted);font-weight:600;}
+  .node .t{font-size:11px;font-weight:600;margin:2px 0 4px;line-height:1.25;}
+  .node .d{font-size:10.5px;line-height:1.4;}
+  .node.marker{background:var(--panel);border-style:dashed;width:130px;justify-content:center;align-items:center;text-align:center;}
+  .node.marker .t{margin:0;}
+  .arrow{width:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);}
+  .legend{font-size:11px;color:var(--muted);margin-top:18px;border-top:1px solid var(--line);padding-top:10px;}
+  footer{font-size:11px;color:var(--muted);text-align:center;padding:18px;border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<header>
+  <h1>Barcelona Scavenger Hunt — Flow Charts</h1>
+  <p>Internal reference. Each tab traces one thread across all 15 stations, in station-number order.</p>
+  <p><b>Act One — The Quest (Stations 1–6):</b> six stations, six virtues, six arches — one letter of D-R-A-G-O-N each, collected out of order (G, R, A, N, D, O at Stations 1, 2, 3, 4, 5, 6). Station 3 (Salo del Tinell) also pops up all six arch slots in the app, since that room really has six physical arches. <b>Station 7:</b> the group finds the Sword and must arrange the six letters into the right order, pivoting into <b>Act Two — The Hunt (Stations 8–15)</b>, where morals shift from virtues to build toward into warnings to watch for.</p>
+  <div class="tabs" id="tabs"></div>
+</header>
+<main id="main"></main>
+<footer>Barcelona Scavenger Hunt — internal planning reference. Not for camper distribution.</footer>
+
+<script>
+const N = 15;
+const names = ["BARCINO","Necropolis","Pl. del Rei","Sta. Maria del Mar","Turtle","El Born","Pont del Bisbe",
+  "Sant Felip Neri","Sta. Caterina","Hotel Gaudí","Palau Música","Miró Mosaic","Arc de Triomf","Tres Dragons","Generalitat (Finale)"];
+
+const flows = {
+
+characters: {
+  title: "Flow of Characters",
+  sub: "Who speaks / appears at each station.",
+  items: [
+    "Emperor Augustus — names the city's founding",
+    "Dead Roman poet",
+    "Isabel de Castilla — royal thread, mentions Colón + Chinese-commerce trade. Salo del Tinell's six real arches pop up all six arch slots in the app here, though this station's own letter is just one of the six",
+    "A bastaix — mentions Ramon Despuig (active mid/late 1300s), who finished the church by 1383",
+    "The Turtle — names Domènech i Montaner as the 'he' who placed it",
+    "The Unknown Architect — buried city, deliberately anonymous",
+    "The Watcher — debut, at the Sword, once the group orders the six collected letters correctly",
+    "Neri — warns: things aren't what they seem, twisted stories",
+    "Narration only — market on alert for mimicry",
+    "The Salamander — Inaction",
+    "Beethoven bust — pass-through",
+    "The Chinese Dragon — False Friends",
+    "The Architect (voice off) — really Josep Vilaseca i Casanovas",
+    "The Architect (full reveal) — really Lluís Domènech i Montaner",
+    "The Watcher — returns, full disclosure",
+  ],
+  markers: {7.5:"Letters reordered into DRAGON — Act One → Two pivot"}
+},
+
+historical: {
+  title: "Flow of Historical Learnings",
+  sub: "The real-world fact the station is built on.",
+  items: [
+    "Barcelona founded as Roman Barcino under Augustus, c. 15 BC",
+    "Roman law kept burial grounds outside the city walls",
+    "Saló del Tinell (1359–62) really has 6 arches; popularly linked to Columbus's 1493 reception",
+    "Santa Maria del Mar (1329–83) was funded and built by the bastaixos, port laborers, not nobility",
+    "Casa de l'Ardiaca's turtle mailbox added in Domènech i Montaner's 1902 restoration",
+    "El Born's excavated 1700s streets were demolished by Philip V after the 1714 siege",
+    "Pont del Bisbe sits in the Gothic Quarter, between the Royal Palace and the Generalitat",
+    "Sant Felip Neri's scars are from a 1938 air-raid, long misattributed to a 1939 firing squad",
+    "Mercat de Santa Caterina (rebuilt 2005) sits on a convent burned in the 1835 riots",
+    "Hotel Gaudí sits across the street from Gaudí's real Palau Güell (1886–90), built for his patron Eusebi Güell; the hotel's dragon/salamander replica references Gaudí's mosaic salamander at Park Güell",
+    "Palau de la Música (1908) was funded by public subscription via the Orfeó Català choir; the Beethoven bust outside nods to his Ode to Joy, later adopted as the official anthem of the EU — Barcelona, Catalonia, Spain, and the EU all meeting at one corner",
+    "Casa Bruno Quadras' Chinese dragon reflects 19th-century Catalan trade with East Asia/the Philippines, itself a late chapter in the older Catalan maritime tradition across Mediterranean islands (Mallorca, Sicily, Sardinia, Naples)",
+    "Miró's 1976 pavement mosaic was designed to be walked on, not just viewed; the dragon lantern above on Casa Bruno Quadras reflects 1880s Orientalist fashion tied to real Catalan maritime trade and commercial presence in the Philippines and other islands",
+    "Arc de Triomf (1888) by Josep Vilaseca, gateway to the Universal Exposition",
+    "Castell dels Tres Dragons (1888) by Domènech i Montaner, a precursor to Modernisme",
+    "Sant Jordi's dragon legend underlies Catalonia's book-and-rose Diada (April 23)",
+  ],
+  markers: {}
+},
+
+architects: {
+  title: "Flow of Architects",
+  sub: "Not every station — only the ones where a real or fictional builder appears.",
+  items: [
+    "— (no architect content)",
+    "— (no architect content)",
+    "— (no architect content)",
+    "Ramon Despuig (took over mid/late 1300s) — completed Santa Maria del Mar by 1383, after Berenguer de Montagut",
+    "Lluís Domènech i Montaner — added the turtle mailbox, 1902 restoration",
+    "The Unknown Architect — buried city; thread formally opens here (Imagination)",
+    "Joan Rubió i Bellver — built the 'medieval-looking' bridge in 1928",
+    "— (no architect content)",
+    "— (no architect content)",
+    "Antoni Gaudí — referenced via the Park Güell salamander replica",
+    "Lluís Domènech i Montaner — Palau de la Música Catalana",
+    "— (no architect content)",
+    "Josep Vilaseca i Casanovas — Arc de Triomf (voiced as 'the Architect')",
+    "Lluís Domènech i Montaner — Tres Dragons; 'the Architect' fully revealed",
+    "— (no architect content)",
+  ],
+  markers: {}
+},
+
+clues: {
+  title: "Flow of Clues",
+  sub: "What is being found / realized at each station.",
+  items: [
+    "BARCINO letters set in the pavement",
+    "Sunken Roman tombs, lower than the street",
+    "Saló del Tinell — 6 real arches; this station's arch yields one letter (A) and pops up all six arch slots in the app",
+    "Carved bastaixos relief above the door",
+    "The turtle + the slow-justice pun",
+    "Buried 1700s street grid under the market roof",
+    "Skull & dagger under a 'thousand-year-old' bridge, plus the Sword",
+    "Plaque correcting the Francoist firing-squad myth",
+    "Ruins under glass floor (history) + colorful roof tiles mimicking dragon scales (the hunt, looking up)",
+    "Salamander replica inside Hotel Gaudí's lobby",
+    "Beethoven bust on the facade",
+    "Miró mosaic underfoot vs. the dragon overhead",
+    "Two real reliefs on opposite faces: city side welcomes the nations (Josep Reynés), park side receives recognition/reward",
+    "The arch over the main door, inscribed 'Tres Dragons' — whimsical Expo-café name, no real dragon myth behind it",
+    "Sant Jordi relief, right by the bridge already visited",
+  ],
+  markers: {7.5:"6 letters from Station 3 decoded to DRAGON"}
+},
+
+challenges: {
+  title: "Flow of Challenges",
+  sub: "The activity/task performed at each station.",
+  items: [
+    "Human BARCINO — spell it with bodies",
+    "Voices for the Nameless — invent a life, quiet photo",
+    "The Royal Announcement (perform) — collects one letter (A); the room's 6 real arches also pop up all six arch slots in the app",
+    "Quarry Math + 5-pair relay race",
+    "Slowest Wins — exaggerated slow-motion walk",
+    "Map the Lost Street — drawing + style sketch-match",
+    "Pin the Skull (blindfolded) + arrange the 6 letters collected at Stations 1–6 (G, R, A, N, D, O) into DRAGON",
+    "Read the plaque, discuss history vs. story, agree on one word",
+    "Color-matched produce hunt (5 fixed roof colors)",
+    "Lobby photo with the dragon/salamander replica",
+    "Group sings Beethoven's Ode to Joy melody together for 30+ seconds",
+    "Low-angle 'dragon's-eye' group photo",
+    "Grand Entrance — theatrical walk-through, filmed",
+    "Name the Third Dragon — from memory, correctly recall the Station 10 and 12 'wrong dragon' locations before the 3rd is revealed",
+    "Three Dragons, One Story — submit photos + sentence + finale shot",
+  ],
+  markers: {}
+},
+
+materials: {
+  title: "Flow of Materials Needed",
+  sub: "Equipment / props required per station.",
+  items: [
+    "Phone camera only",
+    "Phone camera only",
+    "None — improvised performance",
+    "Stopwatch / video camera",
+    "Video camera",
+    "Paper + pen, phone",
+    "Blindfold + spotter per camper; the six letters carried from Stations 1, 2, 3, 4, 5, 6",
+    "None",
+    "Phone camera, color-assignment cards",
+    "Hotel lobby access — pre-arranged permit",
+    "Phone camera",
+    "Phone camera; may need elevated vantage point",
+    "Phone / video camera",
+    "None — memory only",
+    "None — auto-pulled photos from app",
+  ],
+  markers: {}
+},
+
+badges: {
+  title: "Flow of Badges / Awards — Arcs, Sword, Dragons",
+  sub: "Where each uncovering-stage and badge lands across the route.",
+  items: [
+    "ARC 1 of 6 — letter G · Virtue 1 of 6 (Solid Foundations)",
+    "ARC 2 of 6 — letter R · Virtue 2 of 6 (Respect) · Quiet Mind + Old Tongue eligible",
+    "ARC 3 of 6 — letter A · Virtue 3 of 6 (Determination) · room's 6 real arches pop up all six slots in the app",
+    "ARC 4 of 6 — letter N · Virtue 4 of 6 (Sacrifice) · Speed Demon badge",
+    "ARC 5 of 6 — letter D · Virtue 5 of 6 (Patience)",
+    "ARC 6 of 6 — letter O · Virtue 6 of 6 (Imagination) · Architect thread opens · all 6 letters in hand (G, R, A, N, D, O)",
+    "No arch — SWORD found · 6 letters rearranged into DRAGON · Dead-Eye badge · Act One → Two pivot",
+    "Act Two begins · Quiet Mind eligible · Dragon thread live (dormant until 10)",
+    "Completing the mosaic earns the group an ice cream treat from the market",
+    "Dragon Collection card 1 of 3 — Salamander, revealed then stamped with an X (lost chance, wrong creature)",
+    "Full Chorus badge",
+    "Dragon Collection card 2 of 3 — Chinese Dragon, revealed then stamped with an X (lost chance, wrong creature)",
+    "—",
+    "Dragon Collection card 3 of 3 — Tres Dragons, revealed then stamped with an X (lost chance, wrong) · pattern revealed",
+    "Dragon Collection card 4 of 4 — Sant Jordi, the real dragon finally identified · sword's meaning resolves · Dragon Hunter + No Help Needed badges",
+  ],
+  markers: {7.5:"6 letters (from Stations 1–6) rearranged here, alongside the Sword"}
+},
+
+allegory: {
+  title: "Flow of Allegory / Moral of the Story",
+  sub: "Act One (1–6): virtues a city and a person both need, one per Arc/letter. Station 7: the hinge. Act Two (8–15): warnings to watch for.",
+  items: [
+    "Attribute 1/6 — Solid Foundations: walls and a person both need a strong base (education, values)",
+    "Attribute 2/6 — Respect: for the unknown who laid the path before us",
+    "Attribute 3/6 — Determination: Colón's voyage as a personal fight for a dream",
+    "Attribute 4/6 — Sacrifice: shared burden builds a lasting foundation",
+    "Attribute 5/6 — Patience: good results take time to show",
+    "Attribute 6/6 — Imagination: every generation rebuilds with its own creativity",
+    "HINGE: wrongdoing turns a person bad — represented by the dragon — and it finishes badly for him",
+    "WARNING: true history can be buried under a convenient story",
+    "WARNING: the world is not as it is, but as you see it (mimicry)",
+    "WARNING: inaction in front of wrongdoing is almost as bad",
+    "Ode to Joy: Beethoven's theme, now also the EU anthem, links Barcelona, Catalonia, Spain, and the EU in one song — unity across layered identities",
+    "WARNING: discernment over false friends — look from another angle",
+    "WARNING: substance over spectacle — built to impress, not to last",
+    "WARNING: a name alone can manufacture false significance",
+    "SYNTHESIS: avoid inaction + resist false counsel + choose deliberately",
+  ],
+  markers: {}
+},
+
+};
+
+function render(key){
+  const f = flows[key];
+  const main = document.getElementById('main');
+  main.innerHTML = `<div class="flow-title">${f.title}</div><div class="flow-sub">${f.sub}</div>`;
+  const row = document.createElement('div');
+  row.className = 'flow';
+  for(let i=0;i<N;i++){
+    const node = document.createElement('div');
+    const isSkip = f.items[i].trim().startsWith('—');
+    node.className = 'node' + (isSkip ? ' skip' : '');
+    node.innerHTML = `<div class="n">Station ${i+1}</div><div class="t">${names[i]}</div><div class="d">${f.items[i]}</div>`;
+    row.appendChild(node);
+    if(i < N-1){
+      const arrow = document.createElement('div');
+      arrow.className = 'arrow';
+      arrow.textContent = '→';
+      row.appendChild(arrow);
+      const markerKey = i+1.5; // between station i+1 and i+2
+      if(f.markers && f.markers[markerKey]){
+        const m = document.createElement('div');
+        m.className = 'node marker';
+        m.innerHTML = `<div class="t">${f.markers[markerKey]}</div>`;
+        row.appendChild(m);
+        const arrow2 = document.createElement('div');
+        arrow2.className = 'arrow';
+        arrow2.textContent = '→';
+        row.appendChild(arrow2);
+      }
+    }
+  }
+  main.appendChild(row);
+  const legend = document.createElement('div');
+  legend.className = 'legend';
+  legend.textContent = 'Dashed boxes mark thread-opening events between two stations. Shaded boxes mark stations with no content for this particular thread.';
+  main.appendChild(legend);
+}
+
+const tabLabels = {
+  characters:"Characters", historical:"Historical Learnings", architects:"Architects",
+  clues:"Clues", challenges:"Challenges", materials:"Materials Needed",
+  badges:"Badges / Awards", allegory:"Allegory / Moral"
+};
+const tabs = document.getElementById('tabs');
+Object.keys(tabLabels).forEach((key,idx)=>{
+  const btn = document.createElement('button');
+  btn.textContent = tabLabels[key];
+  if(idx===0) btn.classList.add('active');
+  btn.onclick = ()=>{
+    document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    render(key);
+  };
+  tabs.appendChild(btn);
+});
+render('characters');
+</script>
+</body>
+</html>

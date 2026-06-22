@@ -1,0 +1,135 @@
+// Single source of truth for the hunt's 15 stations.
+// NOTE: this file is duplicated at backend/stations.js for now (no shared
+// package set up yet). Keep both copies in sync until that refactor happens.
+
+export const STATIONS = [
+  { id: 1, name: "Plaça Nova — BARCINO", act: 1, judging: "staff", letter: "G", badge: null,
+    character: "Emperor Augustus greets you — Barcelona was founded as Roman Barcino under him, c. 15 BC.",
+    history: "Roman / ancient gate, the city's oldest name.",
+    clue: "\"Before there were Catalans, there were soldiers with short swords and long roads. Find the seven letters that still spell my oldest name, lying flat where everyone walks but no one looks down.\"",
+    hidden: "The BARCINO lettering set into the pavement at Plaça Nova (7 letters).",
+    challenge: "Spell BARCINO with your bodies, photographed from above.",
+    successMsg: "Counselor approval unlocks the next clue and your first letter: G." },
+
+  { id: 2, name: "Roman Necropolis", act: 1, judging: "auto", letter: "R", badge: "Quiet Mind",
+    character: "A dead Roman poet speaks from the sunken tombs.",
+    history: "Roman law kept burial grounds outside the city walls.",
+    clue: "\"I never had a name of my own — only those who walked through me. Look for the sunken garden of stone boxes, lower than the street.\"",
+    hidden: "The sunken walkway of visible Roman tombs.",
+    challenge: "Invent a name & one-line story for someone buried here.",
+    successMsg: "Auto-unlocks once submitted. Letter R collected." },
+
+  { id: 3, name: "Plaça del Rei", act: 1, judging: "staff", letter: "A", badge: null, popsArches: true,
+    character: "Isabel de Castilla speaks of Colón's return — and, in passing, the city's older trade with the East.",
+    history: "Saló del Tinell (1359–62) really has 6 arches; popularly linked to Columbus's 1493 reception.",
+    clue: "\"I am the room where a king and queen are said to have heard of a new world for the first time. Stand beneath the oldest roof in the old city's heart.\"",
+    hidden: "The room's six real arches — this is also where all six arch slots pop up in your collection.",
+    challenge: "Perform a 30-second royal proclamation.",
+    successMsg: "Approval unlocks the next station + letter A. All six arch slots now visible." },
+
+  { id: 4, name: "Santa Maria del Mar", act: 1, judging: "staff", letter: "N", badge: "Speed Demon",
+    character: "A bastaix tells how the church was built — and names Ramon Despuig, who finished it in 1383.",
+    history: "Built 1329–1383 by the bastaixos, port laborers, not nobility.",
+    clue: "\"No king paid for me. No bishop laid my first stone. I was built by men who carried boulders from a mountain by the sea.\"",
+    hidden: "The carved relief of the bastaixos above the main door.",
+    challenge: "Quarry math, then a 5-pair relay race.",
+    successMsg: "Fastest time earns Speed Demon. Letter N collected." },
+
+  { id: 5, name: "Casa de l'Ardiaca — Turtle", act: 1, judging: "staff", letter: "D", badge: null,
+    character: "A stone turtle teases you for rushing — credit goes to 'the architect' (unnamed for now).",
+    history: "The turtle mailbox was added in 1902 by Domènech i Montaner's restoration.",
+    clue: "\"I worked for a man of the church, but the joke carved into my wall has nothing to do with God.\"",
+    hidden: "The riddle's answer is the joke itself: slow justice.",
+    challenge: "Walk the street in exaggerated slow motion.",
+    successMsg: "A carved riddle fragment becomes legible. Letter D collected." },
+
+  { id: 6, name: "El Born", act: 1, judging: "staff", letter: "O", badge: null,
+    character: "An Unknown Architect speaks from the buried streets — the Architect thread opens here.",
+    history: "1700s streets demolished by Philip V after the 1714 siege.",
+    clue: "\"I was a market once, and before that, a neighborhood. Then a king who won a war decided this city needed punishing.\"",
+    hidden: "The excavated 1700s street grid under the market's iron-and-glass roof.",
+    challenge: "Draw the lost street + match architecture styles.",
+    successMsg: "Final letter, O, collected. All six in hand: G-R-A-N-D-O." },
+
+  { id: 7, name: "Pont del Bisbe", act: 1, judging: "sword", badge: "Dead-Eye",
+    character: "The Watcher meets you for the first time, at a sword lodged near the carving.",
+    history: "A 'thousand-year-old' bridge that's actually much newer than it looks.",
+    clue: "\"I look like I've stood for a thousand years — but I'm lying to you. Find the skull pierced by a blade.\"",
+    hidden: "No arch here. Arrange your six letters into the word that names what you're about to hunt.",
+    challenge: "Pin the Skull blindfolded, then arrange your six letters into DRAGON.",
+    successMsg: "The Watcher confirms: \"Dragon. Good. You got there.\" Sword found. Act One ends, Act Two begins." },
+
+  { id: 8, name: "Sant Felip Neri", act: 2, judging: "auto", badge: "Quiet Mind",
+    character: "Neri warns: a creature has been hiding in plain sight, mimetizing.",
+    history: "The wall's scars are from a 1938 air raid, long misattributed to a 1939 firing squad.",
+    clue: "\"For years, people who stood where you are standing now were told a lie about me.\"",
+    hidden: "The memorial plaque correcting the Francoist myth.",
+    challenge: "Discuss history vs. story, then answer the bonus question: what does 'mimetize' mean?",
+    successMsg: "Submission unlocks the market — Neri sends you there himself." },
+
+  { id: 9, name: "Mercat Sta Caterina", act: 2, judging: "auto", badge: null, reward: "Ice cream",
+    character: "No one speaks directly — but the ceiling itself feels like a warning.",
+    history: "Rebuilt 2005, on the site of a convent burned in the 1835 riots.",
+    clue: "\"Look up. Those tiles mimic something older than the market: scales. The kind dragons are supposed to wear.\"",
+    hidden: "A vendor mentions something small and scaled slipping off toward the Eixample.",
+    challenge: "Color-matched produce hunt under the scale-like roof.",
+    successMsg: "Mosaic portrait renders — and you earn ice cream. A trail clue points toward the Eixample." },
+
+  { id: 10, name: "Hotel Gaudí", act: 2, judging: "dragon", creature: "The Salamander", real: false,
+    character: "The Salamander — represents Inaction. Also the creature that had been mimetizing at the market.",
+    history: "Hotel Gaudí sits across from Palau Güell, built by Gaudí for his patron Eusebi Güell.",
+    clue: "\"That creature has followed the architect's own name across the street, into a building that borrows it.\"",
+    hidden: "Confirmed: the mimic from Station 9, now lost, found in the lobby.",
+    challenge: "Lobby photo with the dragon/salamander replica.",
+    successMsg: "Card revealed, then stamped with an X: wrong creature, but confirmed as the Sta. Caterina mimic." },
+
+  { id: 11, name: "Palau de la Música", act: 2, judging: "staff", badge: "Full Chorus",
+    character: "A silent Beethoven bust — but the song you're about to sing is his.",
+    history: "Funded by public subscription via the Orfeó Català choir, 1908.",
+    clue: "\"I was built with coins from hundreds of ordinary singers. A deaf composer never heard a single one of my concerts.\"",
+    hidden: "His Ode to Joy is now also the EU's official anthem.",
+    challenge: "Sing Beethoven's Ode to Joy together for 30s.",
+    successMsg: "Full Chorus badge for outstanding participation." },
+
+  { id: 12, name: "Miró Mosaic", act: 2, judging: "dragon", creature: "The Chinese Dragon", real: false,
+    character: "The Chinese Dragon — represents False Friends. Wakes only once you take the right photo.",
+    history: "Ties to real 19th-century Catalan maritime trade with East Asia.",
+    clue: "\"Above the street, a dragon holds a lantern. Follow where it hangs — look down instead of up.\"",
+    hidden: "Miró's mosaic, meant to be walked on, not just viewed.",
+    challenge: "Low-angle 'dragon's-eye' group photo.",
+    successMsg: "It wakes, gossips, then is stamped with an X: wrong creature." },
+
+  { id: 13, name: "Arc de Triomf", act: 2, judging: "staff", badge: null,
+    character: "A disembodied voice — the Architect — taunts from inside the arch.",
+    history: "Built 1888 by Josep Vilaseca for the Universal Exposition; ran out of money before finishing.",
+    clue: "\"My brick face has two stories carved in stone: one welcomes strangers, the other receives applause.\"",
+    hidden: "Two real reliefs: welcome (hospitality) vs. applause (acclaim).",
+    challenge: "Theatrical 'Grand Entrance' walk-through, filmed.",
+    successMsg: "The Architect teases: 'there's another waiting for you, wearing a dragon's name.'" },
+
+  { id: 14, name: "Castell dels Tres Dragons", act: 2, judging: "dragon", creature: "Tres Dragons", real: false,
+    character: "The Architect reveals himself fully — really Lluís Domènech i Montaner.",
+    history: "An 1888-Exposition café, whimsically named — no real dragon myth behind it.",
+    clue: "\"I was a café, dressed up as a castle, named for creatures that don't exist.\"",
+    hidden: "The carved sign over the door literally names the building — branding, not myth.",
+    challenge: "Recall the first two dragon locations from memory.",
+    successMsg: "Third card stamped with an X. The Architect sends you back to the bridge." },
+
+  { id: 15, name: "Generalitat — Finale", act: 2, judging: "finale", creature: "Sant Jordi's Dragon", real: true,
+    character: "The Watcher returns: \"The thing that hurt me wasn't a monster. It was a man.\"",
+    history: "Sant Jordi's dragon legend underlies Catalonia's book-and-rose Diada (April 23).",
+    clue: "\"You have met this creature three times today, and three times you let it go. Find the knight. Find the rose.\"",
+    hidden: "The relief sits right by Pont del Bisbe — Station 7 — already visited hours ago.",
+    challenge: "Submit your three dragon photos + one sentence + a finale photo.",
+    successMsg: "Real dragon identified: Sant Jordi. Dragon Hunter + No Help Needed badges checked." },
+];
+
+export const ARC_LETTERS = ["G", "R", "A", "N", "D", "O"];
+export const TARGET_WORD = "DRAGON";
+
+export const DRAGON_LABELS = {
+  10: "Salamander",
+  12: "Chinese Dragon",
+  14: "Tres Dragons",
+  15: "Sant Jordi",
+};

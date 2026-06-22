@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Barcelona Scavenger Hunt — Content Mind Map</title>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#1a1a1a; --line:#cccccc; --muted:#666666; --panel:#f4f4f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);}
+  header{padding:20px 28px 16px;border-bottom:1px solid var(--ink);}
+  header h1{margin:0 0 4px;font-size:20px;font-weight:600;}
+  header p{margin:0;font-size:12px;color:var(--muted);}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;align-items:flex-start;}
+  .filter-group{font-size:12px;}
+  .filter-group .label{font-weight:600;display:block;margin-bottom:5px;}
+  .filter-group label{display:inline-flex;align-items:center;gap:5px;margin-right:12px;font-weight:400;cursor:pointer;}
+  .filter-group input{cursor:pointer;}
+  .actions{margin-left:auto;display:flex;gap:8px;align-self:flex-end;}
+  .actions button{font-size:12px;border:1px solid var(--ink);background:#fff;padding:5px 10px;cursor:pointer;}
+  .actions button:hover{background:var(--ink);color:#fff;}
+
+  .layout{display:grid;grid-template-columns:1fr 280px;gap:0;align-items:start;}
+  main{padding:18px 28px 50px;}
+  aside{padding:18px 20px 50px;border-left:1px solid var(--line);background:var(--panel);position:sticky;top:0;max-height:100vh;overflow-y:auto;}
+  aside h2{font-size:13px;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.5px;}
+  aside h2:first-child{margin-top:0;}
+  aside ul{margin:0 0 4px;padding-left:18px;font-size:12px;line-height:1.5;}
+  aside li{margin-bottom:4px;}
+  aside .sub{color:var(--muted);}
+
+  .era-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);
+    border-bottom:1px solid var(--line);padding-bottom:4px;margin:26px 0 12px;}
+  .era-label:first-child{margin-top:0;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+  .card{border:1px solid var(--ink);background:#fff;}
+  .card.hidden{display:none;}
+  .card-head{padding:10px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .card-head:hover{background:#f0f0f0;}
+  .num{font-weight:600;font-size:12px;border:1px solid var(--ink);border-radius:50%;width:22px;height:22px;
+    min-width:22px;display:flex;align-items:center;justify-content:center;}
+  .title-block{flex:1;}
+  .title-block h3{margin:0;font-size:14px;font-weight:600;line-height:1.25;}
+  .chevron{font-size:11px;color:var(--muted);transition:transform .15s;margin-top:3px;}
+  .card.open .chevron{transform:rotate(90deg);}
+
+  .tags{display:flex;gap:5px;flex-wrap:wrap;padding:0 12px 8px;}
+  .tag{font-size:10px;padding:1px 7px;border:1px solid var(--ink);background:#fff;}
+
+  .body{display:none;padding:0 12px 12px;font-size:12.5px;line-height:1.5;border-top:1px solid var(--line);}
+  .card.open .body{display:block;}
+  .aspect{margin-top:9px;}
+  .aspect h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);
+    margin:0 0 3px;border-bottom:1px solid var(--line);padding-bottom:2px;font-weight:600;}
+  .aspect p{margin:0;}
+
+  footer{font-size:11px;color:var(--muted);text-align:center;padding:18px;border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<header>
+  <h1>Barcelona Scavenger Hunt — Content Mind Map</h1>
+  <p>Internal reference. Click a station to expand its full content. Use filters to narrow by act / thread; use the panel on the right to jump by theme.</p>
+  <p>Act One (the Quest, Stations 1–6): six stations, six virtues, six arches — one letter of D-R-A-G-O-N each, collected out of order (G, R, A, N, D, O at Stations 1, 2, 3, 4, 5, 6). Station 3's room (Saló del Tinell) genuinely has six real arches, so completing it also pops up all six arch slots in the app as a preview. The group carries all six letters forward to Station 7, where they find the Sword and must rearrange the letters correctly to decode DRAGON, pivoting into Act Two (the Hunt, Stations 8–15), where morals shift from virtues to build toward into warnings to watch out for.</p>
+  <div class="toolbar">
+    <div class="filter-group">
+      <span class="label">Act</span>
+      <label><input type="checkbox" class="f-act" value="1" checked> Act One</label>
+      <label><input type="checkbox" class="f-act" value="2" checked> Act Two</label>
+    </div>
+    <div class="filter-group">
+      <span class="label">Thread</span>
+      <label><input type="checkbox" class="f-thread" value="dragon" checked> Dragon thread</label>
+      <label><input type="checkbox" class="f-thread" value="arc" checked> Arc motif</label>
+      <label><input type="checkbox" class="f-thread" value="none" checked> No special thread</label>
+    </div>
+    <div class="actions">
+      <button onclick="setAll(true)">Expand all</button>
+      <button onclick="setAll(false)">Collapse all</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <main id="main"></main>
+  <aside id="connections"></aside>
+</div>
+
+<footer>Barcelona Scavenger Hunt — internal planning reference. Not for camper distribution.</footer>
+
+<script>
+const stations = [
+{n:1,name:"Plaça Nova — BARCINO",era:"I. Roman Barcelona",act:1,thread:"arc",
+ character:"Emperor Augustus — named founder-era cameo. Barcelona was founded as the Roman colony Barcino under Augustus (c. 15 BC); he appears briefly to frame the city's birth, light touch, not flagged as significant.",
+ history:"Easy read: Roman / ancient gate / old name of the city, founded under Augustus. Clue: \"Before there were Catalans, there were soldiers with short swords and long roads. They built me with two faces: one looked toward the rising sun, one toward the sea... Find the seven letters that still spell my oldest name, lying flat where everyone walks but no one looks down.\"",
+ hidden:"'Seven letters... lying flat... no one looks down' points to the BARCINO lettering set into the pavement at Plaça Nova (7 letters).",
+ challenge:"Human BARCINO — group spells the word using only their bodies (lying down, arms, legs, no props), split or relayed as needed. Photographed from above.",
+ judged:"Staff on-site confirms legibility/effort, taps approve in counselor view.",
+ collectable:"Photo of the ground lettering + the team's human-letters photo as a bonus collectable. Group also collects Arc 1 of 6 and its letter: G.",
+ success:"Counselor approval flips the station to complete, awards the first Arc + letter, and unlocks the next clue. (Station 1 coordinate still needs on-site confirmation — open item.)",
+ accomplishments:"Station tile discovered: BARCINO pavement lettering. ARC 1 of 6 collected — letter G. Virtue 1 of 6 (Solid Foundations).",
+ directions:"Group proceeds to Station 2 (Roman necropolis, Plaça de la Vila de Madrid) — a short walk away.",
+ allegory:"Attribute 1 of 6 — Solid Foundations. Just as a city needs solid foundations to stand for centuries, a person needs a solid foundation — education, values — to rise and grow."},
+
+{n:2,name:"Roman Necropolis, Pl. Vila de Madrid",era:"I. Roman Barcelona",act:1,thread:"none",
+ character:"A dead Roman poet.",
+ history:"Easy read: Roman tombs / burial ground. Clue: \"I never had a name of my own — only those who walked through me... Look for the sunken garden of stone boxes, lower than the street, where the silence is older than the city itself.\"",
+ hidden:"'Sunken garden of stone boxes, lower than the street' pins the exact sunken walkway of visible tombs.",
+ challenge:"'Voices for the Nameless' — quiet, no game. Group invents one name, trade, and one-sentence life story for an imagined person buried there, then takes one quiet photo at the railing looking down — no posing.",
+ judged:"Auto-graded loosely (checks a name + one-sentence story were submitted). No staff needed.",
+ collectable:"Photo at the railing + the invented name/story, saved as a 'found life' card.",
+ success:"Auto-unlocks once name + story are submitted — deliberate tonal break, no fanfare.",
+ accomplishments:"Station tile discovered: Necropolis tile. ARC 2 of 6 collected — letter R. Virtue 2 of 6 (Respect). Eligible badges: Quiet Mind (time-on-station above minimum); Old Tongue (bonus motto puzzle lives here).",
+ directions:"Group proceeds to Station 3 (Plaça del Rei).",
+ allegory:"Attribute 2 of 6 — Respect. Respect for the unknown people who laid the paths we walk today, even when no one remembers their names."},
+
+{n:3,name:"Plaça del Rei",era:"II. Medieval Barcelona",act:1,thread:"arc",
+ character:"Isabel de Castilla — a royal thread that pays off narratively at the finale. Speaks of Colón's return, framing his voyage as a personal fight for a dream against doubt — and mentions, almost in passing, the city's older tradition of trade with the East, a Chinese-commerce thread already woven into Barcelona's history before the new world was ever found.",
+ history:"Easy read: Royal palace, Columbus connection, medieval square. Clue: \"I am the room where a king and queen are said to have heard of a new world for the first time... Stand where the monarchs may have stood, beneath the oldest roof in the old city's heart.\"",
+ hidden:"'Six great arches... oldest roof' points to the Saló del Tinell specifically — the room is genuinely held up by six real monumental arches, which is what triggers the app to visually 'pop up' all six arch slots in the group's collection at once (even though only this station's own letter is collected here; the other five letters live at Stations 1, 2, 4, 5, and 6).",
+ challenge:"'The Royal Announcement' — 5 minutes to write and perform a 30-second royal proclamation announcing the ships' return (rest of group plays the crowd). Must include one real fact, one invented detail, one group reaction.",
+ judged:"Staff watches the live 30-second performance and approves — judged on commitment/teamwork, not accuracy.",
+ collectable:"Short video of the proclamation, captioned with their invented detail.",
+ success:"Staff approval on the live performance unlocks the next station, and awards Arc 3 of 6.",
+ accomplishments:"Station tile discovered: Saló del Tinell tile. ARC 3 of 6 collected — letter A. Because this room has six real arches, completing it also pops up all six arch slots in the app's collection view — a visual preview of the full set, even though the other five letters are still collected one per station at 1, 2, 4, 5, and 6.",
+ directions:"Group proceeds to Station 5 (Casa de l'Ardiaca — the Turtle) next — Station 4 is visited later in the physical route, not immediately after Station 3.",
+ allegory:"Attribute 3 of 6 — Determination. Colón's voyage becomes a personal fight for a dream against doubt — the lesson: follow your dream and don't let uncertainty stop you from acting on it."},
+
+{n:4,name:"Santa Maria del Mar — The Bastaixos",era:"II. Medieval Barcelona",act:1,thread:"none",
+ character:"A bastaix — allegory: carrying weight together = shared foundations that endure. Mentions the architect who saw the church through to completion after the original builder's death: Ramon Despuig (master builder, c. 1350–1383), who took over after Berenguer de Montagut (the original architect, begun 1329) and finished the building in 1383.",
+ history:"Easy read: A church built by ordinary laborers, not nobility. Clue: \"No king paid for me. No bishop laid my first stone. I was built by men who carried — barefoot, on bare backs — boulders from a mountain by the sea...\"",
+ hidden:"'Look above my door... small figures bent under a weight' points to the carved relief of the bastaixos above the main door.",
+ challenge:"Part A — Quarry Math: word problem on the Montjuïc quarry (~5,000 stones, 54 years), average trips/day, auto-graded with tolerance. Part B — The Relay: 5 pairs run 5 relay laps around the square past the Fossar de les Moreres; under 3 minutes earns a speed bonus.",
+ judged:"Staff films the relay and times it via the video itself.",
+ collectable:"Video collectable doubling as the timer (length minus 2 seconds = official time); counselor 'trim & confirm' step before locking in.",
+ success:"Time locks in once staff trims & confirms the video; fastest time earns the Speed Demon badge, then the next station unlocks.",
+ accomplishments:"Station tile discovered: Bastaixos relief tile. ARC 4 of 6 collected — letter N. Virtue 4 of 6 (Sacrifice). Eligible badge: Speed Demon (fastest relay).",
+ directions:"Group proceeds to Station 6 (El Born) next in the physical route.",
+ allegory:"Attribute 4 of 6 — Sacrifice. Shared burdens build lasting foundations — strength comes from carrying weight together, asking nothing but to be remembered."},
+
+{n:5,name:"Casa de l'Ardiaca — The Turtle Mailbox",era:"II. Medieval Barcelona",act:1,thread:"none",
+ character:"The Turtle (outside the advocats' office). Line: \"Everyone runs past me. He believed slow hands build things that last. Walk like you've got nowhere else to be, and the wall will tell you something the guidebooks don't.\" The 'he' is the architect who actually placed it there: Lluís Domènech i Montaner, who added the turtle-shaped mailbox during his 1902 restoration of Casa de l'Ardiaca — first appearance of the recurring Architect thread (he also designed Palau de la Música, Station 11, and Castell dels Tres Dragons, Station 14).",
+ history:"Easy read: An old house connected to church/law, with an animal somewhere on it. Clue: \"I worked for a man of the church, in a house older than most kingdoms, but the joke carved into my wall has nothing to do with God...\"",
+ hidden:"The riddle's answer is the joke itself (slow justice) — rewards understanding the pun, not just spotting a turtle shape.",
+ challenge:"'Slowest Wins' — single-file walk ~10–15m, no running, exaggerated slow-motion cooperation; whoever finishes last as a team average wins.",
+ judged:"Staff on-site judges visually.",
+ collectable:"Video of the slow-motion walk, captioned with their 'why a turtle' answer.",
+ success:"Once the slow-walk is judged complete, a carved architect's message 'becomes legible' — a riddle fragment/flavor text revealed as a reward for having slowed down — before the next station unlocks.",
+ accomplishments:"Station tile discovered: Turtle tile, plus the hidden architect's-message fragment revealed by the slow-walk. ARC 5 of 6 collected — letter D. Virtue 5 of 6 (Patience).",
+ directions:"Group proceeds to Station 7 (Pont del Bisbe) next in the physical route.",
+ allegory:"Attribute 5 of 6 — Patience. Patience reveals what haste overlooks — slow, deliberate care uncovers a truth the guidebooks don't tell you, and good results take time to show."},
+
+{n:6,name:"El Born — The Buried Neighborhood",era:"III. A City Punished & Rebuilt (1714)",act:1,thread:"none",
+ character:"The Unknown Architect — buried city. No single name survives for who laid out the original neighborhood now excavated beneath the market, so the narration leaves the builder anonymous on purpose: the Architect thread properly begins here, before later stations attach real names to it (Domènech i Montaner, Rubió i Bellver, Gaudí). Frame: Romanesque builders → Gothic masons → 19th-century engineers → Gaudí's organic style — an unbroken line of imagination rebuilding what came before.",
+ history:"Easy read: An old neighborhood buried, found again, now under a market roof. Clue: \"I was a market once, and before that, I was a neighborhood... Then a king who won a war decided this city needed punishing, not rebuilding...\"",
+ hidden:"Points specifically to the excavated 1700s street grid visible under El Born Centre de Cultura's iron-and-glass structure.",
+ challenge:"'Map the Lost Street' — each camper draws the lost layout on paper, group votes (no self-votes), winner redraws it on the phone screen. Now framed with a quick sketch-matching exercise: silhouettes of architectural styles in chronological order.",
+ judged:"Staff manually reviews the on-screen drawing for effort/reasonableness — no single correct answer.",
+ collectable:"Photo looking down into the ruins + the winning on-screen drawing, saved together as one card.",
+ success:"Staff approval on the drawing unlocks the next station. (Coordinate correction for this station still open.)",
+ accomplishments:"Station tile discovered: El Born ruins tile, plus the group's own street drawing as a bonus collectable. ARC 6 of 6 collected — letter O. Virtue 6 of 6 (Imagination / Creativity) — the Architect thread formally opens here. All six letters now in hand, out of order: G (1) · R (2) · A (3) · N (4) · D (5) · O (6).",
+ directions:"Group proceeds to Station 10 (Hotel Gaudí) next in the physical route, crossing into Act Two territory.",
+ allegory:"Attribute 6 of 6 — Imagination / Creativity. Every generation of builders stands on what the last one buried or left behind, and rebuilds it with their own imagination — the Architect thread starts here, continuing the idea of the arches into the idea of the builders themselves."},
+
+{n:7,name:"Pont del Bisbe — The Skull and Dagger",era:"IV. Civic / Gothic-Revival Quarter",act:1,thread:"arc",
+ character:"The Watcher (debut). On the bridge: \"Careful with that blade. It's older than it looks, and it remembers more than you'd think... that sword isn't mine. It belongs to a knight. You found it before you found him — that's no small thing. Go on. Cross back the way you came, eat something, sit down for a while... chew on this.\"",
+ history:"Easy read: An old-looking bridge with a skull carved underneath. Clue: \"I look like I've stood for a thousand years, guarding a street between a palace and a president's house — but I'm lying to you. I was born less than a century ago...\"",
+ hidden:"Forces realization the bridge isn't medieval — built 1928 by Joan Rubió i Bellver, despite appearances.",
+ challenge:"'Pin the Skull' — blindfolded, one at a time, each camper walks forward and stops where they believe they're directly beneath the skull; staff measures the miss in steps (up to 10 attempts total, everyone does at least 1). The group also finds a SWORD lodged near the carving, and must now arrange the six letters collected across Stations 1, 2, 3, 4, 5, and 6 (G, R, A, N, D, O — collected out of order) into the correct order to decode the word that names what they're about to hunt.",
+ judged:"Staff measures and logs each attempt; app sums total miss-steps — lower total is better. Letter-ordering is auto-checked against the correct sequence (D-R-A-G-O-N).",
+ collectable:"Video of the group's best (smallest-miss) attempt, captioned with the team's total score, plus the decoded word DRAGON and a photo of the sword.",
+ success:"Once scored and the letters are correctly ordered, the Watcher appears at the sword and confirms the decoded word — \"Dragon. Good. You got there.\" — and sends them on: \"Go, go, you're behind already.\" This is the Act One (the Quest) → Act Two (the Hunt) pivot, and the true origin point of the Dragon thread: the word is solved here, before any actual creature appears. The moral underneath: wrongdoing turns a person bad — represented by the dragon — and it finishes badly for him, ending up under this very bridge with a dagger across him; it's the Watcher who now sends the group to hunt him.",
+ accomplishments:"Station tile discovered: Skull and Dagger tile. Eligible badge: Dead-Eye (smallest total miss-steps). No arch here — arches finished at 6 of 6. SWORD found (pays off at Station 15). The six letters (G-R-A-N-D-O, collected out of order) are correctly rearranged here to spell DRAGON — Dragon thread opens at this exact moment, before any creature appears (first creature shows up at Station 10).",
+ directions:"Group proceeds to Station 8 (Plaça de Sant Felip Neri) — first stop of Act Two, the Hunt. Safety note: real, often-crowded street — brief campers and use a spotter per blindfolded walker.",
+ allegory:"The hinge moral: wrongdoing turns a person bad — represented by the dragon — and it finishes badly for him. Appearances can lie too — question what looks ancient, and look beneath the surface for the truth someone tried to hide. From here, Act Two's morals shift from virtues to build toward, to warnings to watch out for."},
+
+{n:8,name:"Plaça Sant Felip Neri — The Scarred Wall",era:"V. Twentieth-Century Scars",act:2,thread:"none",
+ character:"Neri himself — a solemn voice on how far cruelty can reach, and the first to warn the group that things are not always what they seem. As the group starts Act Two, he cautions them about twisted stories — using the very myth they were told about this square's scars (blamed for decades on a 1939 firing squad, actually 1938 air-raid shrapnel) as his proof that true history can be buried under a convenient story, the same way the Spanish Civil War produced more than one false official narrative.",
+ history:"Easy read: A sad square, a wall with marks, a tragedy. Clue: \"I am the quietest square in the old city, and also the saddest. For years, people who stood where you are standing now were told a lie about me...\"",
+ hidden:"The 'lie' framing leads to the memorial plaque, correcting the Francoist myth (firing-squad marks) — actually 1938 air-raid shrapnel scars on a building full of children.",
+ challenge:"No game, no timer, no points. Read the plaque aloud together, then briefly discuss and agree as a group on an answer to one question: 'What is the difference between history and story?' Then agree on one single word describing how the place makes the group feel, and submit both.",
+ judged:"Auto-unlocks on submission — no right/wrong answer, cannot be 'failed.'",
+ collectable:"A single still photo of the wall, paired with the group's one submitted word — no posing, no performative shots.",
+ success:"Submission alone unlocks the next station — no celebration, intentionally subdued. This is the first station of Act Two; the Dragon thread (opened at the end of Station 7) is now live, though it stays dormant until Station 10. Brief counselors beforehand: reactions can range solemn to nervously giggly; hold space for either, no 'correct' reaction. No game-like framing language anywhere at this station.",
+ accomplishments:"Station tile discovered: Scarred Wall tile. Eligible badge: Quiet Mind. Group's history-vs-story answer logged as a bonus reflection collectable.",
+ directions:"Group proceeds to Station 9 (Mercat de Santa Caterina) next — Neri sends them there himself, warning that the dragon can mimic its surroundings and telling them to check whether it's hiding in plain sight, blended into the market's own colorful ceiling.",
+ allegory:"First Act Two warning: true history can be covered by false stories — watch for narratives too convenient to be the whole truth."},
+
+{n:9,name:"Mercat de Santa Caterina — The Wavy Roof",era:"VI. Markets Reborn",act:2,thread:"none",
+ character:"Narration only — no named character yet, but the group arrives already on alert: Neri sent them here to check whether the dragon is mimicking its surroundings. Ceiling-tiles beat: \"Look up. Those tiles weren't laid for decoration alone — their color and overlap mimic something older than the market: scales. The kind dragons are supposed to wear. Funny how this city keeps hinting at the same creature in places that have nothing to do with myth.\" The dragon isn't found here — but the market's own camouflage becomes the first proof that it knows how to hide.",
+ history:"Easy read: An old convent burned in the 1835 riots, later a market, with a colorful modern roof. Clue: \"I was a house of prayer once, until an angry crowd burned me to the ground... Look up, and you'll see I never stopped changing — my newest skin is a wave of color...\"",
+ hidden:"Two things are in play at once: 'look down... under glass' points to the excavated convent/Roman-era ruins visible through floor panels inside the market, while 'look up' points to the colorful wavy roof itself — its tile pattern is what mimics dragon scales. The clue deliberately works both directions: down for history, up for the dragon-mimicry beat.",
+ challenge:"Each camper/pair is assigned one of five fixed roof colors. They find a matching real produce item inside the market, photograph it (no touching/buying), and submit.",
+ judged:"Self-check / staff glance comparing submitted produce photo color to the assigned tile color.",
+ collectable:"Auto-generated layered mosaic team portrait using the 5 fixed colors (#B70101 red, #880599 purple, #2217BA blue, #0A8F19 green, #F5ED0F yellow).",
+ success:"Once all 5 colors are in, the app automatically renders the mosaic portrait and unlocks the next station — fittingly, a pixelated, tile-by-tile picture, the same way the dragon hides in plain sight, one scale-like tile at a time. Completing the mosaic also earns the group an ice cream treat from the market as a real-world reward. Working market with real shoppers — brief campers to stay out of vendors' way.",
+ accomplishments:"Station tile discovered: Wavy Roof tile, plus the auto-generated mosaic portrait collectable, plus an ice cream treat.",
+ directions:"Group proceeds to Station 4 (Santa Maria del Mar) next in the physical route — out of numeric order, since Station 4 sits later on the walking path.",
+ allegory:"The world is not as it is, but as you see it — mimicry only works on someone who isn't looking closely. Renewal also matters here: out of ruin and fire comes a new layer, built on top of the old."},
+
+{n:10,name:"Hotel Gaudí — The Dragon's Shadow",era:"VII. Modernisme",act:2,thread:"dragon",
+ character:"The Salamander — represents Inaction. Sends a vague hint toward Station 12, one full station removed.",
+ history:"Easy read: Gaudí, his patron Eusebi Güell, and Park Güell's famous creature. Clue: \"A rich man asked a young architect to build him a house that would announce his fortune to the whole street... That creature has followed the architect's own name across the street, into a building that borrows it.\"",
+ hidden:"'A building that borrows his name' is Hotel Gaudí, directly across the street from Palau Güell.",
+ challenge:"Group walks into Hotel Gaudí's lobby (entry pre-arranged with the hotel), takes one photo with the dragon/salamander replica, no posing required, walks back out. No rooftop visit to Palau Güell itself.",
+ judged:"Staff glance-approves that the dragon is visible in the photo.",
+ collectable:"The photo, plus a one-line invented 'legend' the group writes on the spot for why the dragon ended up indoors.",
+ success:"Approval reveals the first Dragon Collection card — the Salamander — but, per the twist, it's then stamped with a large X across it: a lost chance, wrong creature: \"that's a salamander, borrowed from a park across town, not even native to this story.\" The crossed-out card stays visible in the collection, building momentum toward the finale. Permit arranged directly by the organiser.",
+ accomplishments:"Station tile discovered: Salamander tile. Dragon Collection card 1 of 3 — Salamander — revealed, then stamped with an X: a lost chance, wrong creature. Progress toward Dragon Hunter badge.",
+ directions:"Group proceeds to Station 11 (Palau de la Música Catalana) next.",
+ allegory:"Warning: inaction in front of wrongdoing is almost as bad as the wrongdoing itself — courage means acting despite fear, even when the first answer turns out wrong."},
+
+{n:11,name:"Palau de la Música Catalana — The Chorus",era:"VII. Modernisme",act:2,thread:"none",
+ character:"The Beethoven bust — a pass-through, no dragon content, but the song the group is about to sing is his.",
+ history:"Easy read: A music hall built by public/choral subscription, with an ornate facade. Clue: \"I was not paid for by a king, a bishop, or a rich man's fortune. I was built with coins from hundreds of ordinary singers...\"",
+ hidden:"'A deaf composer who never heard a single one of my concerts' points to the corner Beethoven bust — a German composer with no direct Barcelona connection, whose Ode to Joy later became the official anthem of the European Union.",
+ challenge:"All campers gather facing the facade and sing Beethoven's 'Ode to Joy' melody together for a minimum of 30 seconds — no rehearsal needed, the whole group singing as one chorus.",
+ judged:"Staff confirms the video is at least 30 seconds with the whole group audibly participating (effort only, not musical quality). Same 'trim & confirm' pattern as Station 4 if a clean clip is wanted.",
+ collectable:"The 30-second Ode to Joy chorus video.",
+ success:"Staff confirmation unlocks the next station; outstanding group participation earns the Full Chorus badge. Exterior-only station, no entry needed — fast pacing relief after Palau Güell.",
+ accomplishments:"Station tile discovered: Beethoven bust tile. Eligible badge: Full Chorus.",
+ directions:"Group proceeds to Station 12 (Miró's mosaic, Pla de l'Os) next.",
+ allegory:"Ode to Joy: Beethoven's theme, now also the EU's official anthem, links Barcelona, Catalonia, Spain, and the EU in one song the group sings together — unity across layered identities."},
+
+{n:12,name:"Miró's Mosaic, Pla de l'Os — The Rambla Dragon",era:"VIII. Contemporary City / Pop Culture",act:2,thread:"dragon",
+ character:"The Chinese Dragon — represents False Friends / bad advice. Stays silent until the group completes the perspective photo challenge; only then does it 'wake' and speak. Real-world tie: the Casa Bruno Quadras dragon reflects 19th-century Catalan maritime trade with East Asia (the shop's fortune came from importing fans/parasols, including from the Philippines, then a Spanish colony) — itself a late chapter in a much older Catalan maritime tradition, going back to the medieval Crown of Aragon's trading and naval presence across Mediterranean islands (Mallorca, Sicily, Sardinia, Naples).",
+ history:"Easy read: The Casa Bruno Quadras dragon/lantern on La Rambla, pointing toward Miró's pavement mosaic at Pla de l'Os. Clue: \"Above the street, a dragon holds a lantern, guarding a house that once sold parasols and fans... Follow where its lantern hangs, look down instead of up...\"",
+ hidden:"'Look down instead of up' and 'walked on, not just looked at' evoke Miró's own intent for the mosaic, distinguishing the actual target from the dragon landmark above.",
+ challenge:"Self-directed creative photo challenge: the prompt asks for a specific low-angle 'dragon's-eye view' capturing the full group, the Miró mosaic, AND the Casa Bruno Quadras dragon overhead in one frame. Completion is submission-based — the 'perspective' framing is flavor and fun, not a pass/fail check. May need an elevated vantage point (balcony, raised step).",
+ judged:"Staff glance-approves that all three elements (group + mosaic + dragon) are visible in the shot.",
+ collectable:"The composed photo containing group + mosaic + dragon.",
+ success:"On submission, the Chinese Dragon 'wakes,' delivers its false-solution moment, and hands over a gossip clue pointing toward the museum — then its Dragon Collection card is stamped with a large X: a lost chance, wrong creature: \"that dragon came from a shop trading in foreign goods, and never belonged to this myth.\" Confirm closer to event date whether La Rambla restoration works affect access.",
+ accomplishments:"Station tile discovered: Chinese Dragon tile. Dragon Collection card 2 of 3 — Chinese Dragon — revealed, then stamped with an X: a lost chance, wrong creature. Progress toward Dragon Hunter badge.",
+ directions:"Group proceeds to Station 13 (Arc de Triomf) next.",
+ allegory:"Warning: discernment over false friends — not all guidance is trustworthy, and seeing things from a different angle (the low dragon's-eye view itself) is what it takes to tell a true friend from a false one."},
+
+{n:13,name:"Arc de Triomf",era:"VIII. Contemporary City / Pop Culture",act:2,thread:"arc",
+ character:"The Architect (voice off, debut) — narratively the same mythic voice as Station 14, but historically NOT the same person who built Tres Dragons: the real Arc de Triomf architect was Josep Vilaseca i Casanovas, distinct from both Lluís Domènech i Montaner (Tres Dragons, Station 14) and Joan Rubió i Bellver (Pont del Bisbe, Station 7). The three real architects are deliberately merged into one fictional 'Architect' for narrative economy — flagged here for staff/debrief. Dialogue: \"Triumphal, they called it. Funny word for an arch built for an exposition that ran out of money before it even finished. Architects love arches — easiest way to make something look older and grander than it really is. Yours isn't the first lie I've built. Keep walking. There's another waiting for you, down in the park, wearing a dragon's name.\"",
+ history:"Easy read: A triumphal arch built in 1888 for the city's Universal Exposition, designed by Josep Vilaseca i Casanovas. Clue: \"I was never meant to guard anything. I was built for a party... My brick face has two stories carved in stone: on one side, the city opens its arms to strangers; on the other, it receives its applause.\"",
+ hidden:"'Two stories... arms open... receives applause' refers to the arch's two real relief friezes, on opposite faces: the city-facing relief (by sculptor Josep Reynés) shows Barcelona welcoming the visiting nations to the Exposition; the park-facing relief shows the city receiving recognition and rewards for it. Pushes campers to walk around and look at both sides, not just photograph the arch from one angle.",
+ challenge:"'Grand Entrance' — the group lines up and walks through the arch together in an exaggerated, theatrical 'arriving at a world's fair' entrance (big gestures, waving to imaginary crowds), filmed walking toward the camera.",
+ judged:"Staff glance-approves the performance.",
+ collectable:"Short video of the theatrical walk-through.",
+ success:"Approval unlocks the next station, with the Architect's voice-off teasing what's ahead. Quick, equipment-free palate-cleanser before the denser Ciutadella station.",
+ accomplishments:"Station tile discovered: Arc de Triomf tile. (Note: this is a separate, smaller 'arc' motif used only for the Architect's voice-off cameos at 13/14 — not one of the six Act One Arc-collectibles, which finished at Station 6.)",
+ directions:"Group proceeds to Station 14 (Castell dels Tres Dragons) next, inside Parc de la Ciutadella.",
+ allegory:"Substance over spectacle: the arch was never built to guard or last — it was built purely to impress visitors for one exposition, and ran out of money before it was even finished. A warning that things built only to look grand, without real purpose or follow-through behind them, don't hold up the way something built on a genuine foundation does (the inverse of Attribute 1, Solid Foundations, from Act One)."},
+
+{n:14,name:"Castell dels Tres Dragons",era:"VIII. Contemporary City / Pop Culture",act:2,thread:"dragon",
+ character:"The Architect (full reveal) — represents Wrong Paths. After the group submits their photo believing they've solved it: \"There. Third and last, you thought. I'm sorry — and I'm not. That bridge you crossed twice today, the one that looks like it's stood for six centuries? I built that too, less than a hundred years ago, and dressed it in old stone so you'd believe otherwise. Same trick, smaller building, bigger name: Castell dels Tres Dragons. No dragon ever lived behind that arch. But you already held something that did, before you knew what it was — back where the stone bridge crosses the street. A sword doesn't belong in a museum. It belongs to whoever's still carrying it. Go back.\"",
+ history:"Easy read: A castle-looking building, actually an 1888-Exposition café by Domènech i Montaner (same architect as Palau de la Música). Clue: \"I look like I have stood here since knights and castles were real... I was a café, dressed up as one, named for creatures that don't exist...\"",
+ hidden:"'You've already met one of them, twice' calls back explicitly to Stations 10 and 12 — the first point the dragons become an explicit pattern to campers. The literal clue answer is the arch over the building's main door, where the name 'Tres Dragons' is set into the stone — find that inscribed arch, not just any dragon decoration. The building's actual name, Castell dels Tres Dragons ('Castle of the Three Dragons'), is whimsical branding from its days as an 1888 Exposition café/restaurant — there is no real dragon myth behind the name; it was simply named for effect, the same way the Architect 'lies' with his arches.",
+ challenge:"'Name the Third Dragon' — a memory check before the third reveal: from memory, without map-checking, the group must correctly recall and name the two previous 'wrong dragon' locations (the Salamander at Hotel Gaudí, Station 10; the Chinese Dragon at the Miró mosaic, Station 12) — proving they've actually been tracking the pattern before being shown the third one here.",
+ judged:"Auto-graded, flexible matching on both prior locations.",
+ collectable:"A photo of the building's dragon-themed sculptural details, captioned with the group's two correctly recalled locations.",
+ success:"Auto-grading reveals the third Dragon Collection card and stamps it with a large X: a lost chance, wrong creature: \"those dragons were never alive even in legend, just stage props for a play, named on a whim for an exhibition café.\" The Architect then redirects the group back toward the bridge / Sant Jordi rather than handing them a new clue chain. Historical-fiction flag for staff: Tres Dragons was designed by Lluís Domènech i Montaner (also Station 5's turtle mailbox and Station 11's Palau de la Música), while Pont del Bisbe (Station 7) was Joan Rubió i Bellver and the Arc de Triomf (Station 13) was Josep Vilaseca i Casanovas — three different real architects, merged into one fictional 'Architect' voice for narrative economy; keep the real distinctions available for debrief.",
+ accomplishments:"Station tile discovered: Tres Dragons tile. Dragon Collection card 3 of 3 — Tres Dragons — revealed, then stamped with an X: a lost chance, wrong creature; pattern now fully revealed to campers.",
+ directions:"Group is redirected back to Station 7 / Pont del Bisbe area, then on to Station 15 (Palau de la Generalitat) for the finale.",
+ allegory:"Warning: the wrong path can look convincing — and a name alone (like 'Three Dragons') can manufacture false significance. Perseverance means recognizing it and returning to the true one."},
+
+{n:15,name:"Palau de la Generalitat — FINALE (Sant Jordi)",era:"VIII. Contemporary City / Pop Culture — Closing the Loop",act:2,thread:"dragon",
+ character:"The Watcher (return) — full disclosure: \"So. You made it. You found me by crossing out three things you are not, and never want to become — inaction, false counsel, the wrong door. That's not failure. That's how you find something real.\" / \"...the thing that hurt me wasn't a monster. It was a man — or something wearing a man's shape, the way evil tends to. That's the same thing you've been hunting all day, just with scales instead of skin.\" / \"...that blood wasn't his. It was the dragon's — its last act, not his triumph.\" / \"Aqua Blava, Grana Caelum, Terra Bona, Bona Gent. Good water, a good sky, good earth, good people. You're standing in the proof that it did.\"",
+ history:"Easy read: the legend of Sant Jordi — Catalonia's patron saint myth (knight, dragon, rose). Mega-clue: \"You have met this creature three times today, and three times you let it go... Find the knight. Find the dragon dying beneath his lance. Find the rose that is said to have grown from its blood... Sant Jordi.\"",
+ hidden:"'You walked right past him' forces campers to retrace their day mentally and realize the carving sits at the Palau de la Generalitat, right by Pont del Bisbe (Station 7) — already visited hours earlier.",
+ challenge:"'Three Dragons, One Story' — each group submits: (1) their three dragon photos auto-pulled from collectables, (2) one sentence written together connecting all three to Sant Jordi's legend, (3) a final group photo at the Sant Jordi relief itself.",
+ judged:"Auto-unlocks once all three pieces are submitted — no failure state, a celebratory finish.",
+ collectable:"App auto-generates a closing 'mosaic board' — all four dragon photos together in one grid — as the day's final collectable.",
+ success:"REAL TARGET REVEALED: Sant Jordi's dragon. Only Tres Dragons has any indirect factual link to legend — the other two (Salamander, Chinese Dragon) are unrelated; framed honestly as the city being saturated with dragon imagery for many unrelated reasons. The Watcher's full disclosure also resolves Station 7's moral: the dragon was once a man who did wrong, not a monster from birth. Historical-fiction flag: the real Senyera legend involves the Count of Barcelona, not Sant Jordi — intentional substitution, keep the real version available for debrief.",
+ accomplishments:"Station tile discovered: Sant Jordi relief tile — the 4th and final Dragon Collection card, the real dragon, finally identified after three crossed-out (X-stamped) cards at Stations 10, 12, and 14. Eligible badges: Dragon Hunter (all 3 X-stamped cards + reached finale), No Help Needed (no help button used all day).",
+ directions:"End of route — day's final collectable (mosaic board) generated; no further station.",
+ allegory:"Full moral formula: Avoid inaction + Resist false counsel + Choose your paths deliberately = lets vulnerability and growth (the princess) flourish, protected by honor, strength, and conviction (Jordi's virtues)."},
+];
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+}
+function aspectRow(label, value){
+  if(!value || value==="—" || value==="") return "";
+  return `<div class="aspect"><h4>${label}</h4><p>${escapeHtml(value)}</p></div>`;
+}
+function tagsFor(s){
+  let t = s.act===1 ? `<span class="tag">Act One</span>` : `<span class="tag">Act Two</span>`;
+  if(s.thread==="dragon") t += `<span class="tag">Dragon thread</span>`;
+  if(s.thread==="arc") t += `<span class="tag">Arc motif</span>`;
+  return t;
+}
+
+const startText = "Tap Start to activate the station and reveal its clue. The favorite/star button can be tapped at any time to flag this station for later review (e.g. for rewriting or follow-up), independent of completion.";
+
+const eras = [];
+stations.forEach(s=>{ if(!eras.includes(s.era)) eras.push(s.era); });
+
+const main = document.getElementById('main');
+stations.forEach(s=>{
+  s._el = null;
+});
+eras.forEach(era=>{
+  const label = document.createElement('div');
+  label.className = 'era-label';
+  label.textContent = era;
+  main.appendChild(label);
+
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  stations.filter(s=>s.era===era).forEach(s=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.act = s.act;
+    card.dataset.thread = s.thread;
+    card.id = 'station-' + s.n;
+    card.innerHTML = `
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="num">${s.n}</div>
+        <div class="title-block">
+          <h3>${escapeHtml(s.name)}</h3>
+        </div>
+        <div class="chevron">▶</div>
+      </div>
+      <div class="tags">${tagsFor(s)}</div>
+      <div class="body">
+        ${aspectRow("1 · Start (activate / favorite button)", startText)}
+        ${aspectRow("2 · Intro to Character", s.character)}
+        ${aspectRow("3 · History of Site (brief)", s.history)}
+        ${aspectRow("4 · Hidden Detail", s.hidden)}
+        ${aspectRow("5 · Challenge", s.challenge)}
+        ${aspectRow("6 · Judging", s.judged)}
+        ${aspectRow("7 · Collectable", s.collectable)}
+        ${aspectRow("8 · Success Message", s.success)}
+        ${aspectRow("9 · Accomplishments (badges + tile discovered)", s.accomplishments)}
+        ${aspectRow("10 · Directions to Next Clue", s.directions)}
+        ${aspectRow("11 · Allegory to Values (moral of the story)", s.allegory)}
+      </div>
+    `;
+    grid.appendChild(card);
+    s._el = card;
+  });
+  main.appendChild(grid);
+});
+
+function setAll(open){
+  document.querySelectorAll('.card').forEach(c=>{
+    if(open) c.classList.add('open'); else c.classList.remove('open');
+  });
+}
+
+function jumpTo(n){
+  const el = document.getElementById('station-'+n);
+  if(!el) return;
+  el.classList.remove('hidden');
+  el.classList.add('open');
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function applyFilters(){
+  const acts = Array.from(document.querySelectorAll('.f-act:checked')).map(c=>c.value);
+  const threads = Array.from(document.querySelectorAll('.f-thread:checked')).map(c=>c.value);
+  stations.forEach(s=>{
+    const el = s._el;
+    const actOk = acts.includes(String(s.act));
+    const threadOk = threads.includes(s.thread);
+    if(actOk && threadOk){ el.classList.remove('hidden'); }
+    else { el.classList.add('hidden'); }
+  });
+}
+document.querySelectorAll('.f-act, .f-thread').forEach(cb=>cb.addEventListener('change', applyFilters));
+
+// ---- Connections panel ----
+const connections = document.getElementById('connections');
+
+function listBlock(title, items){
+  const h = document.createElement('h2');
+  h.textContent = title;
+  connections.appendChild(h);
+  const ul = document.createElement('ul');
+  items.forEach(it=>{
+    const li = document.createElement('li');
+    li.innerHTML = it;
+    ul.appendChild(li);
+  });
+  connections.appendChild(ul);
+}
+
+listBlock("Characters", [
+  '<a href="#" onclick="jumpTo(7);jumpTo(15);return false;">The Watcher</a> — Stations 7 (debut), 15 (return / full disclosure)',
+  '<a href="#" onclick="jumpTo(13);jumpTo(14);return false;">The Architect</a> — Stations 13 (voice off), 14 (full reveal)',
+  '<a href="#" onclick="jumpTo(3);return false;">Isabel de Castilla</a> — Station 3 (royal thread, pays off at finale)',
+  '<a href="#" onclick="jumpTo(4);return false;">A bastaix</a> — Station 4 (shared-labor allegory)',
+  '<a href="#" onclick="jumpTo(5);return false;">The Turtle</a> — Station 5 (slow-justice joke)',
+  '<a href="#" onclick="jumpTo(10);return false;">The Salamander</a> — Station 10 (Inaction)',
+  '<a href="#" onclick="jumpTo(12);return false;">The Chinese Dragon</a> — Station 12 (False Friends)',
+]);
+
+listBlock("Dragon Thread (chain)", [
+  '<a href="#" onclick="jumpTo(10);return false;">10 — Salamander</a>: wrong creature #1',
+  '<a href="#" onclick="jumpTo(12);return false;">12 — Chinese Dragon</a>: wrong creature #2',
+  '<a href="#" onclick="jumpTo(14);return false;">14 — Tres Dragons</a>: wrong creature #3 (pattern becomes explicit)',
+  '<a href="#" onclick="jumpTo(15);return false;">15 — Sant Jordi</a>: real target revealed',
+]);
+
+listBlock("Arc Motif (chain)", [
+  '<a href="#" onclick="jumpTo(1);return false;">1 — Roman gate</a>: Arc 1 (achieved fast, fades into background)',
+  '<a href="#" onclick="jumpTo(7);return false;">7 — Pont del Bisbe</a>: Arc 2 (double bridge crossing, Act 1/2 threshold)',
+  '<a href="#" onclick="jumpTo(13);return false;">13/14 — Arc de Triomf → Tres Dragons</a>: Arc 3 (lands with dragon #3)',
+]);
+
+listBlock("Badges Index", [
+  'Six Arches (D-R-A-G-O-N) — one letter each at <a href="#" onclick="jumpTo(1);return false;">1</a> (G), <a href="#" onclick="jumpTo(2);return false;">2</a> (R), <a href="#" onclick="jumpTo(3);return false;">3</a> (A), <a href="#" onclick="jumpTo(4);return false;">4</a> (N), <a href="#" onclick="jumpTo(5);return false;">5</a> (D), <a href="#" onclick="jumpTo(6);return false;">6</a> (O) — Station 3\\'s room also pops up all six arch slots',
+  'The Sword + letters rearranged into DRAGON — <a href="#" onclick="jumpTo(7);return false;">Station 7</a>, sword pays off at <a href="#" onclick="jumpTo(15);return false;">15</a>',
+  'Speed Demon — <a href="#" onclick="jumpTo(4);return false;">Station 4</a>',
+  'Dead-Eye — <a href="#" onclick="jumpTo(7);return false;">Station 7</a>',
+  'Quiet Mind — <a href="#" onclick="jumpTo(2);return false;">Station 2</a> / <a href="#" onclick="jumpTo(8);return false;">8</a>',
+  'Old Tongue (bonus) — <a href="#" onclick="jumpTo(2);return false;">Station 2</a>',
+  'Ice cream treat — <a href="#" onclick="jumpTo(9);return false;">Station 9</a>',
+  'Full Chorus — <a href="#" onclick="jumpTo(11);return false;">Station 11</a>',
+  'First-Try Genius — any station, first-attempt riddle solve',
+  'Dragon Collection cards, X-stamped (lost chances) — <a href="#" onclick="jumpTo(10);return false;">10</a>, <a href="#" onclick="jumpTo(12);return false;">12</a>, <a href="#" onclick="jumpTo(14);return false;">14</a>; real dragon card at <a href="#" onclick="jumpTo(15);return false;">15</a>',
+  'Dragon Hunter — <a href="#" onclick="jumpTo(15);return false;">Station 15</a> (requires 10, 12, 14)',
+  'No Help Needed — whole-route badge, checked at <a href="#" onclick="jumpTo(15);return false;">Station 15</a>',
+]);
+
+listBlock("Allegory / Values Index — Act One (virtues to build)", [
+  '<a href="#" onclick="jumpTo(1);return false;">1</a> — Solid Foundations (letter G)',
+  '<a href="#" onclick="jumpTo(2);return false;">2</a> — Respect (letter R)',
+  '<a href="#" onclick="jumpTo(3);return false;">3</a> — Determination (letter A)',
+  '<a href="#" onclick="jumpTo(4);return false;">4</a> — Sacrifice (letter N)',
+  '<a href="#" onclick="jumpTo(5);return false;">5</a> — Patience (letter D)',
+  '<a href="#" onclick="jumpTo(6);return false;">6</a> — Imagination / Creativity (letter O)',
+  '<a href="#" onclick="jumpTo(7);return false;">7</a> — Hinge: wrongdoing turns a person bad, represented by the dragon, and it finishes badly for him',
+]);
+
+listBlock("Allegory / Values Index — Act Two (warnings to avoid)", [
+  '<a href="#" onclick="jumpTo(8);return false;">8</a> — True history can be buried by convenient stories',
+  '<a href="#" onclick="jumpTo(9);return false;">9</a> — The world is not as it is, but as you see it (mimicry)',
+  '<a href="#" onclick="jumpTo(10);return false;">10</a> — Inaction is almost as bad as wrongdoing',
+  '<a href="#" onclick="jumpTo(11);return false;">11</a> — Ode to Joy: unity across BCN / Catalonia / Spain / EU',
+  '<a href="#" onclick="jumpTo(12);return false;">12</a> — Discernment over false friends',
+  '<a href="#" onclick="jumpTo(13);return false;">13</a> — Substance over spectacle',
+  '<a href="#" onclick="jumpTo(14);return false;">14</a> — A name alone can manufacture false significance',
+  '<a href="#" onclick="jumpTo(15);return false;">15</a> — Full synthesis: avoid inaction + resist false counsel + choose deliberately',
+]);
+
+listBlock("Architects Thread (real people, fictionally woven)", [
+  '<a href="#" onclick="jumpTo(6);return false;">6</a> — The Unknown Architect (buried city) — thread opens here, deliberately anonymous',
+  '<a href="#" onclick="jumpTo(5);return false;">5</a> — Lluís Domènech i Montaner — turtle mailbox, 1902 restoration',
+  '<a href="#" onclick="jumpTo(11);return false;">11</a> — Lluís Domènech i Montaner — Palau de la Música Catalana',
+  '<a href="#" onclick="jumpTo(14);return false;">14</a> — Lluís Domènech i Montaner — Castell dels Tres Dragons (fictional "Architect" full reveal)',
+  '<a href="#" onclick="jumpTo(7);return false;">7</a> — Joan Rubió i Bellver — Pont del Bisbe (merged into "Architect" voice)',
+  '<a href="#" onclick="jumpTo(13);return false;">13</a> — Josep Vilaseca i Casanovas — Arc de Triomf (merged into "Architect" voice)',
+  '<a href="#" onclick="jumpTo(10);return false;">10</a> — Antoni Gaudí — Park Güell salamander, referenced via the hotel replica',
+  '<a href="#" onclick="jumpTo(4);return false;">4</a> — Ramon Despuig — completed Santa Maria del Mar (1349–1383) after Berenguer de Montagut',
+  '<span class="sub">Domènech i Montaner is the strongest real thread (5, 11, 14); the other names are folded into one fictional "Architect" voice at 13/14 for narrative economy.</span>',
+]);
+
+listBlock("Route Order (physical, per map)", [
+  '1 → 2 → 3 → 5 → 7 → 8 → 9 → 4 → 6 → 10 → 11 → 12 → 13 → 14 → 15',
+  '<span class="sub">Note: physical walking order differs from station numbering at 3→5 (skips 4) and 9→4→6 (4 and 6 visited later).</span>',
+]);
+</script>
+</body>
+</html>

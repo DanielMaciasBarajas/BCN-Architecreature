@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.quest-display {
+  font-family: 'Cinzel', serif;
+}
+.quest-body {
+  font-family: 'Source Sans 3', sans-serif;
+}

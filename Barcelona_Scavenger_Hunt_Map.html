@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Barcelona scavenger hunt — route map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  body { margin:0; font-family: Arial, sans-serif; background:#EFE6CC; }
+  #map { height:100vh; width:100%; }
+  .legend { position:absolute; top:10px; right:10px; background:#fff; padding:10px 14px; border-radius:8px; font-size:12px; z-index:1000; box-shadow:0 1px 4px rgba(0,0,0,0.3); max-width:220px; }
+  .legend div { margin:3px 0; }
+  .swatch { display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:6px; vertical-align:middle; border:1px solid #2C2C2A; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="legend">
+  <div><b>Barcelona scavenger hunt</b></div>
+  <div>circled areas = where a station lies</div>
+  <div>footprints = the route between stations</div>
+  <div>multiple numbers in one circle = stations sharing a zone</div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const stations = [
+  {n:1,name:"Plaça Nova — BARCINO",lat:41.3839,lng:2.1761},
+  {n:2,name:"Roman necropolis, Pl. Vila de Madrid",lat:41.3833,lng:2.1736},
+  {n:3,name:"Plaça del Rei",lat:41.3829,lng:2.1772},
+  {n:4,name:"Santa Maria del Mar — Fossar de les Moreres",lat:41.3834,lng:2.1828},
+  {n:5,name:"Casa de l'Ardiaca",lat:41.3839,lng:2.1758},
+  {n:6,name:"El Born",lat:41.3850,lng:2.1827},
+  {n:7,name:"Pont del Bisbe",lat:41.3833,lng:2.1764},
+  {n:8,name:"Plaça Sant Felip Neri — fountain",lat:41.3830,lng:2.1746},
+  {n:9,name:"Mercat Santa Caterina",lat:41.3856,lng:2.1780},
+  {n:10,name:"Hotel Gaudí (dragon/salamander)",lat:41.3788,lng:2.1738},
+  {n:11,name:"Palau de la Música Catalana",lat:41.3875,lng:2.1755},
+  {n:12,name:"Miró mosaic, Pla de l'Os",lat:41.3803,lng:2.1735},
+  {n:13,name:"Arc de Triomf",lat:41.3906,lng:2.1817},
+  {n:14,name:"Castell dels Tres Dragons — Seu científica",lat:41.3870,lng:2.1862},
+  {n:15,name:"Palau de la Generalitat — FINALE (Sant Jordi)",lat:41.3833,lng:2.1764},
+];
+
+// route order for the footprint trail
+const routeOrder = [1,2,3,5,7,8,9,4,6,10,11,12,13,14,15];
+
+// zones: groups of stations sharing one circled area when close together
+const zones = [
+  {ids:[1,2], color:"#7F77DD"},
+  {ids:[3,5,7,8,15], color:"#5DCAA5"},
+  {ids:[4,6], color:"#F0997B"},
+  {ids:[9], color:"#EF9F27"},
+  {ids:[10], color:"#ED93B1"},
+  {ids:[11], color:"#ED93B1"},
+  {ids:[12], color:"#ED93B1"},
+  {ids:[13], color:"#ED93B1"},
+  {ids:[14], color:"#ED93B1"},
+];
+
+const byId = {};
+stations.forEach(s => byId[s.n] = s);
+
+const map = L.map('map', {zoomControl:true}).setView([41.3835,2.1790], 15);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  maxZoom: 19, subdomains:'abcd',
+  attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+}).addTo(map);
+
+// draw zone circles, sized to cover all member stations with padding
+function dist(a,b){
+  const dx = (a.lat-b.lat)*111320;
+  const dy = (a.lng-b.lng)*111320*Math.cos(a.lat*Math.PI/180);
+  return Math.sqrt(dx*dx+dy*dy);
+}
+zones.forEach(z => {
+  const pts = z.ids.map(id => byId[id]);
+  const clat = pts.reduce((s,p)=>s+p.lat,0)/pts.length;
+  const clng = pts.reduce((s,p)=>s+p.lng,0)/pts.length;
+  const center = {lat:clat,lng:clng};
+  let radius = Math.max(...pts.map(p => dist(center,p))) + 35;
+  if (radius < 55) radius = 55;
+  L.circle([clat,clng], {
+    radius: radius, color: z.color, weight: 2, opacity:0.8,
+    fillColor: z.color, fillOpacity: 0.18
+  }).addTo(map);
+  const label = pts.map(p=>p.n).join(" · ");
+  const names = pts.map(p=>`${p.n}. ${p.name}`).join("<br>");
+  L.marker([clat,clng], {icon: L.divIcon({
+    html:`<div style="background:#FBF6E8;border:2px solid ${z.color};border-radius:14px;padding:4px 12px;font-size:15px;font-weight:700;color:#2C2C2A;font-family:Arial,sans-serif;white-space:nowrap;transform:translate(-50%,-130%);box-shadow:0 1px 3px rgba(0,0,0,0.35)">${label}</div>`,
+    iconSize:[0,0], iconAnchor:[0,0]
+  })}).addTo(map).bindPopup(names);
+});
+
+
+</script>
+</body>
+</html>
