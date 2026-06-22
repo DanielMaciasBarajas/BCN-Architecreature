@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   MapPin,
   CheckCircle2,
-  XCircle,
   Trophy,
   Users,
   LayoutDashboard,
@@ -203,10 +202,10 @@ const STATIONS = [
     name: "Sant Felip Neri",
     act: 2,
     judging: "staff",
-    character: "The Watcher",
-    meetLine: "standing very still in the small square, listening",
+    character: "The Fountain Face",
+    meetLine: "carved into the small stone fountain, facing the scarred wall, listening",
     greeting:
-      "Quiet, for a second. Did you hear that, a minute ago? Sounded almost like a roar. I think it came from over toward the Palau. Before you go — look at these walls. They're not decoration.",
+      "Quiet, for a second. I've been facing this wall a long time — longer than most people stop to notice. Look at it properly before you go. It's not decoration.",
     history:
       "The pockmarks across this church's facade are real shrapnel scars from a bombing on January 30, 1938, during the Spanish Civil War, which killed dozens of people, many of them children sheltering in the square.",
     challengeText:
@@ -214,7 +213,7 @@ const STATIONS = [
     factLog: "The pockmarked walls of Sant Felip Neri are shrapnel scars from a 1938 bombing during the Spanish Civil War.",
     moral: "Memory",
     farewell:
-      "That roar I heard — I'd put money on it being something dragon-shaped, over by the Palau. Go look. Carefully.",
+      "Good. Carry that quiet with you. There's a grand house up ahead with a bird who thinks rather a lot of himself.",
     nextArea: "Palau Güell",
     nextClueHint: "Look for a wrought-iron gate beneath a tall stone facade, with something perched above it.",
   },
@@ -222,9 +221,7 @@ const STATIONS = [
     id: 9,
     name: "Palau Güell",
     act: 2,
-    judging: "dragon",
-    creature: "The Bird of Palau Güell",
-    real: false,
+    judging: "staff",
     character: "The Bird of Palau Güell",
     meetLine: "perched above the gate, unimpressed by the attention",
     greeting:
@@ -232,7 +229,7 @@ const STATIONS = [
     history:
       "Palau Güell was designed by a young Antoni Gaudí between 1886 and 1890 as a private mansion for his patron Eusebi Güell. Its rooftop is covered in surreal mosaic-tiled chimneys, and ironwork creatures perch above its entrance — easy to mistake for something fiercer than they are, from a distance.",
     challengeText:
-      "Take your group photo with the bird above the gate, then find and photograph at least two of the chimney shapes on the rooftop terrace photo provided — match each to what it resembles.",
+      "Take your group photo with the bird above the gate. Then head into the lobby of the Hotel Gaudí, just across the street, where photographs of the rooftop chimneys are on display — find and photograph at least two chimney shapes, and match each to what it resembles.",
     factLog: "Palau Güell (1886–1890) was Antoni Gaudí's first major Barcelona commission, built for his patron Eusebi Güell — its ironwork and chimneys are easy to mistake for something else at a glance.",
     moral: "Not Everything That Looks Fierce Is",
     farewell:
@@ -244,13 +241,11 @@ const STATIONS = [
     id: 10,
     name: "La Rambla — the Mosaic and the Dragon",
     act: 2,
-    judging: "dragon",
-    creature: "The Umbrella Dragon",
-    real: false,
+    judging: "staff",
     character: "The Umbrella Dragon",
     meetLine: "perched on the corner of an old shop, holding an umbrella, as it has for over a century",
     greeting:
-      "Yes, I'm a dragon. Yes, I'm holding an umbrella. No, I am not the one you're hunting — I've just been advertising parasols since 1885 and I'm very good at my job. Step on the mosaic behind you while you're here; everyone does.",
+      "Yes, I'm a dragon. Yes, I'm holding an umbrella. I've just been advertising parasols since 1885 and I'm very good at my job. Step on the mosaic behind you while you're here; everyone does.",
     history:
       "This dragon-and-umbrella sculpture has marked an old umbrella and parasol shop on La Rambla since 1885. A few steps away, Joan Miró set a large circular mosaic into the pavement itself in 1976, marking the heart of the street he grew up walking.",
     challengeText:
@@ -258,7 +253,7 @@ const STATIONS = [
     factLog: "The umbrella-shop dragon on La Rambla dates to 1885; Joan Miró's pavement mosaic nearby was installed in 1976.",
     moral: "Spectacle Isn't Substance",
     farewell:
-      "If you're hunting something real, try the market with the wild roof. Things hide in plain colorful sight there too.",
+      "The market up ahead has a roof wilder than anything I'm wearing. Go look — there's another creature waiting there too.",
     nextArea: "Mercat Santa Caterina",
     nextClueHint: "Look for a wavy, multicolored mosaic roof rising above a row of market stalls.",
   },
@@ -318,7 +313,7 @@ const STATIONS = [
     factLog: "The Arc de Triomf (1888) was designed by Josep Vilaseca i Casanovas as the entrance to that year's Barcelona Universal Exposition.",
     moral: "Look Up Once in a While",
     farewell:
-      "Go on, then. Last stop. Whatever you've been hunting, it isn't hiding in brickwork anymore — it's standing in the open, back where this whole thing started.",
+      "Go on, then — last stop. Plaça Sant Jaume's waiting, same as it always has been.",
     nextArea: "Plaça Sant Jaume — the Finale",
     nextClueHint: "Look for the carved skull beneath the bridge you crossed earlier — you're going back the way you came.",
   },
@@ -326,21 +321,19 @@ const STATIONS = [
     id: 14,
     name: "Plaça Sant Jaume — The Finale",
     act: 2,
-    judging: "finale",
-    creature: "Sant Jordi's Dragon",
-    real: true,
-    character: "The Watcher",
+    judging: "staff",
+    character: "Sant Jordi",
     meetLine: "waiting exactly where the bridge first sent you off",
     greeting:
-      "You're back. Good — that means you found nothing, four times over, and didn't settle for any of it. A bird. An umbrella. A roof full of fruit. A wing in the brickwork. None of them were it, and you knew that, and kept going anyway. Look up.",
+      "Back where you started, more or less. Six letters became a word, and that word sent you walking this whole city looking at things sideways — Gaudí's ironwork, a market roof, a concert hall's stonework, an arch nobody looks up at. That's the whole trick of this place: it's covered in faces, if you bother to look. One more before you're done.",
     history:
       "Sant Jordi (Saint George) is Catalonia's patron saint, honored every April 23rd — Barcelona's biggest celebration of books and roses — for slaying a dragon to save a princess. Versions of that dragon are carved, painted, or tiled onto buildings all across this city, including several within sight of where you're standing right now.",
     challengeText:
-      "Find a real carved or sculpted Sant Jordi dragon within sight of this square. Photograph your whole group with it, and explain in one sentence why this one — and not the bird, the umbrella, the roof, or the wing — is the one you were sent to find.",
+      "Find a carved or sculpted Sant Jordi dragon within sight of this square. Photograph your whole group with it, and have one person explain why this saint and this story are still carved into buildings all over this city, centuries later.",
     factLog: "Sant Jordi, Catalonia's patron saint, is honored every April 23rd for slaying a dragon — versions of which are carved across many buildings in this part of the city.",
-    moral: "Discernment",
+    moral: "Noticing",
     farewell:
-      "There it is. Not loud, not hiding, not pretending to be anything else — just old stone, doing what it's always done, waiting for someone to actually look. That's the whole hunt, in the end. Well done.",
+      "There it is. Old stone, carved with care, just waiting for someone to actually look. That's been the whole point, station after station. Well done — go celebrate, you've earned it.",
     nextArea: null,
     nextClueHint: null,
   },
@@ -847,7 +840,6 @@ export default function ScavengerHuntPrototype() {
   const [lettersCollected, setLettersCollected] = useState([]);
   const [arcsPopped, setArcsPopped] = useState(false);
   const [sword, setSword] = useState(false);
-  const [dragonCards, setDragonCards] = useState({}); // {stationId: 'x' | 'real'}
   const [badges, setBadges] = useState([]);
   const [iceCream, setIceCream] = useState(false);
   const [pending, setPending] = useState(null);
@@ -860,7 +852,6 @@ export default function ScavengerHuntPrototype() {
     setPhotoUploads((p) => ({ ...p, [key]: url }));
   }
   const [orderGuess, setOrderGuess] = useState([]);
-  const [finaleDone, setFinaleDone] = useState(false);
   const [log, setLog] = useState([]);
   const [chronicle, setChronicle] = useState([]); // [{id,name,fact,moral}]
   const [stationsData, setStationsData] = useState(STATIONS);
@@ -979,17 +970,6 @@ export default function ScavengerHuntPrototype() {
     } else if (station.judging === "auto") {
       if (photoUrl) recordPhotoUpload(`challenge-${station.id}`, photoUrl);
       awardStation(station);
-    } else if (station.judging === "dragon") {
-      setDragonCards((p) => ({ ...p, [station.id]: "x" }));
-      pushLog(`Dragon Collection card revealed: ${station.creature} — stamped with an X.`);
-      recordChronicle(station);
-      setPhase("resolved");
-    } else if (station.judging === "finale") {
-      setDragonCards((p) => ({ ...p, [station.id]: "real" }));
-      setFinaleDone(true);
-      pushLog("Finale submitted — real dragon identified: Sant Jordi.");
-      recordChronicle(station);
-      setPhase("resolved");
     } else if (station.judging === "bridge") {
       // blindfold challenge complete -> badge now, then bridge intermission
       if (photoUrl) recordPhotoUpload(`challenge-${station.id}`, photoUrl);
@@ -1000,8 +980,7 @@ export default function ScavengerHuntPrototype() {
   }
 
   function submitCrossingChallenge(photoUrl) {
-    setDragonCards((p) => ({ ...p, [station.id]: "x" }));
-    pushLog(`Dragon Collection card revealed: ${station.creature} — stamped with an X.`);
+    pushLog(`Crossing challenge complete: Station ${station.id}.`);
     setChronicle((c) => [...c, { id: station.id, name: "Hotel across the street", fact: station.crossFactLog, moral: station.crossMoral }]);
     if (photoUrl) recordPhotoUpload(`crossing-${station.id}`, photoUrl);
     setPhase("resolved");
@@ -1079,7 +1058,6 @@ export default function ScavengerHuntPrototype() {
     setLettersCollected([]);
     setArcsPopped(false);
     setSword(false);
-    setDragonCards({});
     setBadges([]);
     setIceCream(false);
     setPending(null);
@@ -1087,7 +1065,6 @@ export default function ScavengerHuntPrototype() {
     setArrivalApprovals({});
     setPhotoUploads({});
     setOrderGuess([]);
-    setFinaleDone(false);
     setLog([]);
     setChronicle([]);
     setScreen("intro");
@@ -1155,7 +1132,6 @@ export default function ScavengerHuntPrototype() {
             lettersCollected={lettersCollected}
             arcsPopped={arcsPopped}
             sword={sword}
-            dragonCards={dragonCards}
             badges={badges}
             iceCream={iceCream}
             pending={pending}
@@ -1173,7 +1149,6 @@ export default function ScavengerHuntPrototype() {
             photoUploads={photoUploads}
             advanceToNextStation={advanceToNextStation}
             goToMap={goToMap}
-            finaleDone={finaleDone}
             chronicle={chronicle}
             onFinishHunt={() => setScreen("closing")}
           />
@@ -1186,7 +1161,6 @@ export default function ScavengerHuntPrototype() {
             badges={badges}
             sword={sword}
             iceCream={iceCream}
-            dragonCards={dragonCards}
             onRestart={resetAll}
             recordPhotoUpload={recordPhotoUpload}
           />
@@ -1216,10 +1190,8 @@ export default function ScavengerHuntPrototype() {
             stationIdx={stationIdx}
             lettersCollected={lettersCollected}
             badges={badges}
-            dragonCards={dragonCards}
             sword={sword}
             iceCream={iceCream}
-            finaleDone={finaleDone}
             photoUploads={photoUploads}
           />
         )}
@@ -1457,15 +1429,15 @@ function InstructionsScreen({ onStart, onBack }) {
 /* ---------------------------------------------------------------------- */
 /* CLOSING SCREEN — congratulations + compiled moral of the story         */
 /* ---------------------------------------------------------------------- */
-function ClosingScreen({ chronicle, lettersCollected, badges, sword, iceCream, dragonCards, onRestart, recordPhotoUpload }) {
-  const realFound = Object.values(dragonCards).includes("real");
+function ClosingScreen({ chronicle, lettersCollected, badges, sword, iceCream, onRestart, recordPhotoUpload }) {
+  const allStationsDone = chronicle.length >= STATIONS.length;
   return (
     <div className="space-y-5 quest-body">
       <Card className="text-center py-8">
         <Trophy className="w-10 h-10 text-amber-600 mx-auto mb-3" />
         <h1 className="quest-display text-2xl mb-1">The Hunt is Complete</h1>
         <p className="text-sm text-[#a8987a] uppercase tracking-wide font-semibold mb-5">
-          {realFound ? "Sant Jordi's Dragon — found at last" : "Hunt ended early"}
+          {allStationsDone ? "Every station found — the hunt is complete" : "Hunt ended early"}
         </p>
         <PhotoUploadSlot
           folder="final-group"
@@ -1497,13 +1469,12 @@ function ClosingScreen({ chronicle, lettersCollected, badges, sword, iceCream, d
           <BookOpen className="w-4 h-4" /> The Moral of the Story
         </h3>
         <p className="text-[#4a4233] leading-relaxed mb-4">
-          You started today by learning that nothing stands without a foundation — and you ended it staring down
-          something that had been hiding, in plain sight, all along. In between, the city asked you for patience,
-          sacrifice, imagination, and honesty about what's real and what only looks real up close. Three times today
-          you found something convincing and walked away from it anyway — and that, it turns out, wasn't failure.
-          That was the whole skill. The thing worth protecting was never going to be the loudest, scariest, most
-          obvious thing in the room. It was the one still standing quietly in front of you, waiting to be recognized
-          for what it actually was.
+          You started today by learning that nothing stands without a foundation — and you spent the rest of it
+          noticing creatures hiding in plain sight: carved into doorways, perched over gates, holding up roofs
+          that have stood for centuries. In between, the city asked you for patience, sacrifice, imagination,
+          and a closer look at things everyone else walks straight past. That's the whole skill, in the end. The
+          things worth noticing were never going to announce themselves. They were carved quietly into the
+          stone, waiting for someone to actually look.
         </p>
         {chronicle.length > 0 && (
           <details className="text-sm text-[#6b5f4a]">
@@ -1708,7 +1679,6 @@ function CamperView({
   lettersCollected,
   arcsPopped,
   sword,
-  dragonCards,
   badges,
   iceCream,
   pending,
@@ -1726,12 +1696,10 @@ function CamperView({
   photoUploads = {},
   advanceToNextStation,
   goToMap,
-  finaleDone,
   chronicle,
   onFinishHunt,
 }) {
   const isPendingHere = pending && pending.id === station.id;
-  const isFinale = station.judging === "finale";
   const isLastStation = stationIdx === total - 1;
   const nextStation = stationsData[stationIdx + 1];
   const [arrivalModalTarget, setArrivalModalTarget] = React.useState(null);
@@ -1783,21 +1751,21 @@ function CamperView({
         {phase === "arches" && (
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-[#6b5f4a] uppercase tracking-wide flex items-center gap-1.5">
-              <Compass className="w-4 h-4" /> The Exterior — Six Arches
+              <Compass className="w-4 h-4" /> Round to the Courtyard
             </h3>
+            <p className="text-[#4a4233] leading-relaxed italic">"{station.archesIntro}"</p>
             <div className="space-y-1.5">
               <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold">Find this</p>
-              <PicturePlaceholder src={archesImageUrl(station.id)} label="The Six Arches" sublabel={station.archesClueHint} />
+              <PicturePlaceholder src={nextClueImageUrl(station.id)} label={`Something at ${station.name}`} sublabel="The courtyard, through the doors, around the corner." />
             </div>
-            <p className="text-[#4a4233] leading-relaxed italic">"{station.archesIntro}"</p>
-            <p className="text-xs text-[#a8987a]">Snap your group in front of it — staff will check it and reveal the arches in your Collection.</p>
+            <p className="text-xs text-[#a8987a]">Once your group has arrived and spotted it, upload a photo to prove it — staff will check it and unlock the station.</p>
             <ArrivalGate
-              targetStation={{ id: `${station.id}-arches`, name: "the Six Arches", character: station.character }}
+              targetStation={station}
               arrivalPending={arrivalPending}
               arrivalApprovals={arrivalApprovals}
               onOpenModal={setArrivalModalTarget}
               onContinue={() => setPhase("meet")}
-              continueLabel="Onward — round to the courtyard"
+              continueLabel={`Arrived — meet ${station.character}`}
             />
           </div>
         )}
@@ -1841,22 +1809,12 @@ function CamperView({
             <p className="text-[#4a4233] leading-relaxed">{station.challengeText}</p>
             {station.id === 5 && <DrawingPad />}
             {station.id === 11 && <MosaicBuilder />}
-            {station.judging !== "dragon" && station.judging !== "finale" && (
-              <ChallengeProofUpload folder={`challenge-${station.id}`} onUploaded={setChallengeProofUrl} />
-            )}
+            <ChallengeProofUpload folder={`challenge-${station.id}`} onUploaded={setChallengeProofUrl} />
 
             {isPendingHere ? (
               <div className="flex items-center gap-2 text-sm bg-amber-100 border border-amber-300 rounded-lg px-3 py-2 text-amber-800">
                 <ScrollText className="w-4 h-4" /> Waiting on staff approval...
               </div>
-            ) : station.judging === "dragon" ? (
-              <button onClick={() => submitChallenge(challengeProofUrl)} className="bg-rose-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-rose-800 transition-colors">
-                Identify the creature
-              </button>
-            ) : isFinale ? (
-              <button onClick={() => submitChallenge(challengeProofUrl)} className="bg-emerald-700 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-emerald-800 transition-colors">
-                Submit finale collectables
-              </button>
             ) : (
               <button onClick={() => submitChallenge(challengeProofUrl)} className="bg-amber-600 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-amber-700 transition-colors">
                 {station.judging === "bridge" ? "Complete blindfold challenge" : "Complete challenge"}
@@ -1975,8 +1933,28 @@ function CamperView({
               </div>
             </div>
 
-            {(station.judging === "dragon" || station.judging === "palace") && <DragonCardView creature={station.creature} status={dragonCards[station.id]} />}
-            {isFinale && finaleDone && <FinaleSummary dragonCards={dragonCards} badges={badges} />}
+            <div className="rounded-lg border border-[#cfc09a] bg-[#FBF6E8] p-3 space-y-2">
+              <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" /> Architecreature Hunt (optional)
+              </p>
+              <p className="text-xs text-[#a8987a]">
+                A side quest, not required to continue: match this carving in person and snap your group with it.
+                Collect them all in your Collection's Characters tab.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <PicturePlaceholder src={characterImageUrl(station.id)} label={station.character} sublabel="find this" />
+                {photoUploads[`creature-${station.id}`] ? (
+                  <PicturePlaceholder src={photoUploads[`creature-${station.id}`]} label="Your match" sublabel="captured!" />
+                ) : (
+                  <PhotoUploadSlot
+                    folder={`creature-${station.id}`}
+                    label="Your match"
+                    sublabel="photograph your group with it"
+                    onUploaded={(url) => recordPhotoUpload(`creature-${station.id}`, url)}
+                  />
+                )}
+              </div>
+            </div>
 
             <div className="rounded-lg bg-[#e9e1cb] border border-[#cfc09a] px-3 py-2 flex items-center gap-2">
               <span className="text-[11px] uppercase tracking-wide font-semibold text-[#8a7a5a]">Moral</span>
@@ -1993,7 +1971,11 @@ function CamperView({
             {station.nextClueHint && nextStation && (
               <div className="space-y-1.5">
                 <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold">Spot this at {station.nextArea}</p>
-                <PicturePlaceholder src={nextClueImageUrl(nextStation.id)} label={`Something at ${station.nextArea}`} sublabel={station.nextClueHint} />
+                <PicturePlaceholder
+                  src={nextStation.hasArchesPrephase ? archesImageUrl(nextStation.id) : nextClueImageUrl(nextStation.id)}
+                  label={`Something at ${station.nextArea}`}
+                  sublabel={station.nextClueHint}
+                />
               </div>
             )}
 
@@ -2042,17 +2024,25 @@ function CamperView({
             {station.nextClueHint && (
               <div className="space-y-1.5">
                 <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold">Keep an eye out for</p>
-                <PicturePlaceholder src={nextClueImageUrl(nextStation.id)} label={`Something at ${nextStation.name}`} sublabel={station.nextClueHint} />
+                <PicturePlaceholder
+                  src={nextStation.hasArchesPrephase ? archesImageUrl(nextStation.id) : nextClueImageUrl(nextStation.id)}
+                  label={`Something at ${nextStation.name}`}
+                  sublabel={station.nextClueHint}
+                />
               </div>
             )}
             <p className="text-xs text-[#a8987a]">Once your group has arrived and spotted it, upload a photo to prove it — staff will check it and unlock the station.</p>
             <ArrivalGate
-              targetStation={nextStation}
+              targetStation={
+                nextStation.hasArchesPrephase
+                  ? { id: `${nextStation.id}-arches`, name: "the Six Arches", character: nextStation.character }
+                  : nextStation
+              }
               arrivalPending={arrivalPending}
               arrivalApprovals={arrivalApprovals}
               onOpenModal={setArrivalModalTarget}
               onContinue={advanceToNextStation}
-              continueLabel={`Arrived — meet ${nextStation.character}`}
+              continueLabel={nextStation.hasArchesPrephase ? "Onward — find the courtyard" : `Arrived — meet ${nextStation.character}`}
             />
           </div>
         )}
@@ -2076,7 +2066,6 @@ function CamperView({
         sword={sword}
         iceCream={iceCream}
         badges={badges}
-        dragonCards={dragonCards}
         chronicle={chronicle}
         photoUploads={photoUploads}
       />
@@ -2087,133 +2076,204 @@ function CamperView({
 /* ---------------------------------------------------------------------- */
 /* COLLECTION AREA                                                        */
 /* ---------------------------------------------------------------------- */
-function CollectionArea({ act, lettersCollected, arcsPopped, sword, iceCream, badges, dragonCards, chronicle, photoUploads = {} }) {
-  const showHunt = act === 2 || Object.keys(dragonCards).length > 0;
-  const foundCount = Object.keys(dragonCards).length;
+function CollectionArea({ act, lettersCollected, arcsPopped, sword, iceCream, badges, chronicle, photoUploads = {} }) {
   const [lightbox, setLightbox] = React.useState(null); // {src, label} | null
+  const [tab, setTab] = React.useState("rewards");
+
+  const galleryEntries = Object.entries(photoUploads).filter(([key]) => !key.startsWith("arrival-"));
+
+  const TABS = [
+    { id: "rewards", label: "Rewards & Badges", icon: Trophy },
+    { id: "chronicle", label: "City Chronicle", icon: BookOpen },
+    { id: "characters", label: "Characters", icon: Sparkles },
+    { id: "gallery", label: "Gallery", icon: ImagePlus },
+  ];
+
+  async function shareToWhatsApp(url, label) {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: label, text: `${label} — Architecreature Hunt`, url });
+        return;
+      } catch (e) {
+        // user cancelled, or this browser can't share this content — fall through to the link
+      }
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(`${label} — Architecreature Hunt\n${url}`)}`, "_blank");
+  }
 
   return (
     <div className="rounded-2xl border border-[#cfc09a] bg-gradient-to-b from-[#FBF6E8] to-[#F1E9D8] p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="quest-display text-base tracking-wide text-[#2b2620]">
-          {showHunt ? "Your Collection" : "Your Rewards"}
-        </h3>
+        <h3 className="quest-display text-base tracking-wide text-[#2b2620]">Your Collection</h3>
         <span className="text-[11px] uppercase tracking-wide text-[#a8987a]">{lettersCollected.length}/6 letters</span>
       </div>
 
-      {/* Arches */}
-      <div className="mb-4">
-        <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold mb-2">The Arches</p>
-        {!arcsPopped ? (
-          <div>
-            {lettersCollected.length > 0 ? (
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                {lettersCollected.map((l, i) => (
-                  <span key={i} className="w-8 h-8 rounded-full bg-amber-600 border border-amber-700 text-white font-bold text-sm flex items-center justify-center shadow-sm">
-                    {l}
-                  </span>
-                ))}
-              </div>
-            ) : null}
-            <p className="text-xs text-[#a8987a] italic">
-              Something is waiting to be uncovered — keep going until you reach Plaça del Rei.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-wrap items-end gap-2">
-            {ARC_LETTERS.map((l, i) => (
-              <ArchShape key={i} letter={l} filled={lettersCollected.includes(l)} locked={!lettersCollected.includes(l)} />
-            ))}
-            {sword && (
-              <span className="ml-1 w-10 h-12 rounded-lg flex items-center justify-center bg-slate-700 text-white border border-slate-800 shadow-sm">
-                <Swords className="w-5 h-5" />
-              </span>
-            )}
-          </div>
-        )}
+      <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setTab(t.id)}
+            className={
+              "shrink-0 flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-1.5 transition-colors " +
+              (tab === t.id ? "bg-[#2b2620] text-amber-300" : "bg-[#FBF6E8] border border-[#cfc09a] text-[#6b5f4a] hover:bg-[#e3d8bc]")
+            }
+          >
+            <t.icon className="w-3.5 h-3.5" /> {t.label}
+          </button>
+        ))}
       </div>
 
-      {/* Hunt the Dragon — Act 2 only */}
-      {showHunt && (
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold flex items-center gap-1.5">
-              <Flame className="w-3.5 h-3.5" /> Hunt the Dragon
-            </p>
-            <span className="text-[11px] text-[#a8987a]">{foundCount}/4 found</span>
+      {tab === "rewards" && (
+        <div className="space-y-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold mb-2">The Arches</p>
+            {!arcsPopped ? (
+              <div>
+                {lettersCollected.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    {lettersCollected.map((l, i) => (
+                      <span key={i} className="w-8 h-8 rounded-full bg-amber-600 border border-amber-700 text-white font-bold text-sm flex items-center justify-center shadow-sm">
+                        {l}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                <p className="text-xs text-[#a8987a] italic">
+                  Something is waiting to be uncovered — keep going until you reach Plaça del Rei.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-end gap-2">
+                {ARC_LETTERS.map((l, i) => (
+                  <ArchShape key={i} letter={l} filled={lettersCollected.includes(l)} locked={!lettersCollected.includes(l)} />
+                ))}
+                {sword && (
+                  <span className="ml-1 w-10 h-12 rounded-lg flex items-center justify-center bg-slate-700 text-white border border-slate-800 shadow-sm">
+                    <Swords className="w-5 h-5" />
+                  </span>
+                )}
+              </div>
+            )}
           </div>
-          {foundCount === 0 ? (
-            <p className="text-xs text-[#a8987a] italic">No creatures found yet.</p>
-          ) : (
+
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold mb-2">Badges &amp; Treasures</p>
             <div className="flex flex-wrap gap-2">
-              {Object.entries(dragonCards).map(([id, status]) => (
-                <span
-                  key={id}
-                  className="text-xs bg-[#FBF6E8] border border-[#cfc09a] rounded-full pl-3 pr-2 py-1.5 flex items-center gap-1.5 shadow-sm"
-                >
-                  {STATIONS_DRAGON_LABEL[id]}
-                  {status === "x" && <XCircle className="w-3.5 h-3.5 text-rose-700" />}
-                  {status === "real" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />}
+              {iceCream && (
+                <span className="text-xs bg-pink-100 text-pink-800 border border-pink-200 rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-sm">
+                  <IceCream className="w-3.5 h-3.5" /> Ice cream
                 </span>
+              )}
+              {badges.map((b) => (
+                <span key={b} className="relative group text-xs bg-[#2b2620] text-amber-300 rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-sm cursor-default">
+                  <Trophy className="w-3.5 h-3.5" /> {b}
+                  <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 hidden group-hover:block w-48 bg-[#2b2620] text-[#F1E9D8] text-[11px] leading-snug rounded-lg px-2.5 py-2 shadow-lg z-20">
+                    {BADGE_INFO[b] || "A reward earned along the way."}
+                  </span>
+                </span>
+              ))}
+              {!iceCream && badges.length === 0 && <span className="text-xs text-[#a8987a] italic">Nothing collected yet — keep exploring.</span>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === "chronicle" && (
+        <div>
+          {chronicle.length === 0 ? (
+            <p className="text-xs text-[#a8987a] italic">No history recorded yet.</p>
+          ) : (
+            <ul className="text-xs text-[#4a4233] space-y-2.5">
+              {chronicle.map((c, i) => {
+                const thumbSrc = photoUploads[`arrival-${c.id}`] || nextClueImageUrl(c.id);
+                return (
+                  <li key={i} className="flex gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setLightbox({ src: thumbSrc, label: `${c.id}. ${c.name}` })}
+                      className="w-12 h-12 shrink-0 rounded-md overflow-hidden hover:opacity-80 hover:scale-105 transition-transform cursor-zoom-in"
+                      aria-label={`Expand photo for ${c.name}`}
+                    >
+                      <PicturePlaceholder src={thumbSrc} compact />
+                    </button>
+                    <div>
+                      <span className="font-semibold">{c.id}. {c.name}</span> — {c.fact}
+                      <br />
+                      <span className="text-[#8a7a5a] italic">Moral: {c.moral}</span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {tab === "characters" && (
+        <div>
+          <p className="text-xs text-[#a8987a] mb-2.5">
+            Every character your group has met, exactly as carved into the city. This is the reference for the
+            Architecreature side-hunt — your own match photos live in the Gallery tab.
+          </p>
+          {chronicle.length === 0 ? (
+            <p className="text-xs text-[#a8987a] italic">No characters met yet.</p>
+          ) : (
+            <ul className="text-xs text-[#4a4233] space-y-2.5">
+              {chronicle.map((c, i) => (
+                <li key={i} className="flex gap-2.5 items-center">
+                  <button
+                    type="button"
+                    onClick={() => setLightbox({ src: characterImageUrl(c.id), label: c.name })}
+                    className="w-12 h-12 shrink-0 rounded-md overflow-hidden hover:opacity-80 hover:scale-105 transition-transform cursor-zoom-in"
+                    aria-label={`Expand photo for ${c.name}`}
+                  >
+                    <PicturePlaceholder src={characterImageUrl(c.id)} compact />
+                  </button>
+                  <div>
+                    <span className="font-semibold">{c.name}</span>
+                    <br />
+                    <span className="text-[#8a7a5a] italic">{c.moral}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {tab === "gallery" && (
+        <div>
+          <p className="text-xs text-[#a8987a] mb-2.5">
+            Every photo your group has uploaded — challenges, found-it proof, and Architecreature matches. Share
+            your favorites straight to WhatsApp.
+          </p>
+          {galleryEntries.length === 0 ? (
+            <p className="text-xs text-[#a8987a] italic">Nothing uploaded yet — your group's photos will show up here.</p>
+          ) : (
+            <div className="grid grid-cols-3 gap-2">
+              {galleryEntries.map(([key, url]) => (
+                <div key={key} className="space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => setLightbox({ src: url, label: key })}
+                    className="w-full aspect-square rounded-md overflow-hidden block hover:opacity-80 transition-opacity"
+                  >
+                    <img src={url} alt={key} className="w-full h-full object-cover" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => shareToWhatsApp(url, key)}
+                    className="w-full text-[10px] font-semibold flex items-center justify-center gap-1 border border-[#cfc09a] rounded-full py-1 hover:bg-[#e3d8bc]"
+                  >
+                    Share
+                  </button>
+                </div>
               ))}
             </div>
           )}
         </div>
       )}
-
-      {/* Badges + treasures */}
-      <div className="mb-4">
-        <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold mb-2">Badges &amp; Treasures</p>
-        <div className="flex flex-wrap gap-2">
-          {iceCream && (
-            <span className="text-xs bg-pink-100 text-pink-800 border border-pink-200 rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-sm">
-              <IceCream className="w-3.5 h-3.5" /> Ice cream
-            </span>
-          )}
-          {badges.map((b) => (
-            <span key={b} className="relative group text-xs bg-[#2b2620] text-amber-300 rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-sm cursor-default">
-              <Trophy className="w-3.5 h-3.5" /> {b}
-              <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 hidden group-hover:block w-48 bg-[#2b2620] text-[#F1E9D8] text-[11px] leading-snug rounded-lg px-2.5 py-2 shadow-lg z-20">
-                {BADGE_INFO[b] || "A reward earned along the way."}
-              </span>
-            </span>
-          ))}
-          {!iceCream && badges.length === 0 && <span className="text-xs text-[#a8987a] italic">Nothing collected yet — keep exploring.</span>}
-        </div>
-      </div>
-
-      {/* City Chronicle — fact + moral together, one entry per station */}
-      <div>
-        <p className="text-[11px] uppercase tracking-wide text-[#8a7a5a] font-semibold mb-2 flex items-center gap-1.5">
-          <BookOpen className="w-3.5 h-3.5" /> City Chronicle
-        </p>
-        {chronicle.length === 0 ? (
-          <p className="text-xs text-[#a8987a] italic">No history recorded yet.</p>
-        ) : (
-          <ul className="text-xs text-[#4a4233] space-y-2.5">
-            {chronicle.map((c, i) => {
-              const thumbSrc = photoUploads[`arrival-${c.id}`] || nextClueImageUrl(c.id);
-              return (
-                <li key={i} className="flex gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setLightbox({ src: thumbSrc, label: `${c.id}. ${c.name}` })}
-                    className="w-12 h-12 shrink-0 rounded-md overflow-hidden hover:opacity-80 hover:scale-105 transition-transform cursor-zoom-in"
-                    aria-label={`Expand photo for ${c.name}`}
-                  >
-                    <PicturePlaceholder src={thumbSrc} compact />
-                  </button>
-                  <div>
-                    <span className="font-semibold">{c.id}. {c.name}</span> — {c.fact}
-                    <br />
-                    <span className="text-[#8a7a5a] italic">Moral: {c.moral}</span>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
 
       {lightbox && (
         <Modal onClose={() => setLightbox(null)}>
@@ -2227,27 +2287,6 @@ function CollectionArea({ act, lettersCollected, arcsPopped, sword, iceCream, ba
           </button>
         </Modal>
       )}
-    </div>
-  );
-}
-
-const STATIONS_DRAGON_LABEL = {
-  9: "The Bird",
-  10: "Umbrella Dragon",
-  13: "Sant Jordi",
-};
-
-function DragonCardView({ creature, status }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="rounded-lg border border-[#cfc09a] bg-[#FBF6E8] px-3 py-2 flex items-center gap-2 shrink-0">
-        <span className="text-xs font-semibold">{creature}</span>
-        {status === "x" && <XCircle className="w-5 h-5 text-rose-700" />}
-        {status === "real" && <CheckCircle2 className="w-5 h-5 text-emerald-700" />}
-      </div>
-      <p className="text-sm text-[#4a4233]">
-        Dragon Collection card revealed{status === "x" ? " — a lost chance, wrong creature." : "."}
-      </p>
     </div>
   );
 }
@@ -2297,54 +2336,6 @@ function SwordPuzzle({ lettersCollected, sword, orderGuess, usedIdx, toggleLette
         <button onClick={submitSwordOrder} disabled={orderGuess.length !== 6} className="text-sm bg-rose-700 text-white rounded-full px-4 py-1.5 disabled:opacity-40 hover:bg-rose-800">
           Submit order
         </button>
-      </div>
-    </div>
-  );
-}
-
-function FinaleSummary({ dragonCards, badges }) {
-  const architects = [
-    "Lluís Domènech i Montaner — Palau de la Música Catalana",
-    "Antoni Gaudí — Palau Güell, his first major Barcelona commission",
-    "Joan Rubió i Bellver — Pont del Bisbe",
-    "Ramon Despuig — Santa Maria del Mar (completion)",
-    "Enric Miralles & Benedetta Tagliabue — Mercat Santa Caterina (2005 renovation)",
-    "Joan Miró — La Rambla pavement mosaic, 1976",
-    "Josep Vilaseca i Casanovas — Arc de Triomf, 1888",
-  ];
-  return (
-    <div className="space-y-3">
-      <p className="text-sm text-emerald-800 flex items-center gap-2">
-        <CheckCircle2 className="w-4 h-4" /> Finale complete — real dragon identified: Sant Jordi.
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {Object.entries(dragonCards).map(([id, status]) => (
-          <span key={id} className="text-xs bg-[#FBF6E8] border border-[#cfc09a] rounded-full pl-3 pr-2 py-1.5 flex items-center gap-1.5">
-            {STATIONS_DRAGON_LABEL[id]}
-            {status === "x" && <XCircle className="w-3.5 h-3.5 text-rose-700" />}
-            {status === "real" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />}
-          </span>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {badges.map((b) => (
-          <span key={b} className="text-xs bg-[#2b2620] text-amber-300 rounded-full px-3 py-1 flex items-center gap-1">
-            <Trophy className="w-3 h-3" /> {b}
-          </span>
-        ))}
-      </div>
-      <div className="rounded-lg bg-[#e9e1cb] border border-[#cfc09a] px-3 py-2.5">
-        <p className="text-[11px] uppercase tracking-wide font-semibold text-[#8a7a5a] mb-1.5">
-          The City's Many Architects
-        </p>
-        <ul className="text-xs text-[#4a4233] space-y-1">
-          {architects.map((a) => (
-            <li key={a}>• {a}</li>
-          ))}
-        </ul>
-        <p className="text-[11px] text-[#a8987a] italic mt-1.5">
-          One city, many builders — none of them strangers to each other's work.
-        </p>
       </div>
     </div>
   );
@@ -2443,7 +2434,7 @@ function SyncStatusBadge({ status }) {
   );
 }
 
-function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsList, groupsSyncStatus, group, stationIdx, lettersCollected, badges, dragonCards, sword, iceCream, finaleDone, photoUploads = {} }) {
+function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsList, groupsSyncStatus, group, stationIdx, lettersCollected, badges, sword, iceCream, photoUploads = {} }) {
   const liveStation = stationsData[stationIdx];
   const liveProgress = Math.round(((stationIdx + 1) / stationsData.length) * 100);
   const [editingId, setEditingId] = React.useState(null);
@@ -2667,17 +2658,8 @@ function AdminView({ stationsData, saveStationEdit, stationsSyncStatus, groupsLi
       <Card>
         <h3 className="text-sm font-semibold text-[#6b5f4a] mb-2 uppercase tracking-wide">Live group detail</h3>
         <p className="text-sm text-[#4a4233]">
-          Letters: {lettersCollected.join(", ") || "none yet"} · Word solved: {sword ? "yes" : "not yet"} · Ice cream: {iceCream ? "yes" : "no"} · Finale: {finaleDone ? "complete" : "in progress"}
+          Letters: {lettersCollected.join(", ") || "none yet"} · Word solved: {sword ? "yes" : "not yet"} · Ice cream: {iceCream ? "yes" : "no"}
         </p>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {Object.entries(dragonCards).map(([id, status]) => (
-            <span key={id} className="text-xs bg-[#FBF6E8] border border-[#cfc09a] rounded-full pl-3 pr-2 py-1.5 flex items-center gap-1.5">
-              {STATIONS_DRAGON_LABEL[id]}
-              {status === "x" && <XCircle className="w-3.5 h-3.5 text-rose-700" />}
-              {status === "real" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />}
-            </span>
-          ))}
-        </div>
       </Card>
     </div>
   );
