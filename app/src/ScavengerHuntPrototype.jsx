@@ -558,6 +558,7 @@ function MosaicBuilder() {
     const t = e.touches[0];
     if (t) paintAtPoint(t.clientX, t.clientY);
   }
+  function paintCell(i) {
     if (!activeColor) return;
     setCells((p) => {
       const next = [...p];
